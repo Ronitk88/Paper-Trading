@@ -1,3 +1,5 @@
+import os
+
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi.security import HTTPBearer
@@ -6,7 +8,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from jose import jwt
 from jose import JWTError
 
-SECRET_KEY = "papertradingsecret"
+SECRET_KEY = os.getenv("SECRET_KEY", "papertradingsecret")
 ALGORITHM = "HS256"
 
 security = HTTPBearer()

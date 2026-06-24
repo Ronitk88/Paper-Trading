@@ -1,8 +1,9 @@
+import os
 from datetime import datetime, timedelta
 
 from jose import jwt
 
-SECRET_KEY = "papertradingsecret"
+SECRET_KEY = os.getenv("SECRET_KEY", "papertradingsecret")
 ALGORITHM = "HS256"
 
 
