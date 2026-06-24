@@ -143,7 +143,7 @@ input {
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
   display: grid;
-  grid-template-columns: auto minmax(0, 460px) auto;
+  grid-template-columns: 320px 1fr auto;
   align-items: center;
   gap: 12px;
   padding: 0 30px;
@@ -155,7 +155,8 @@ input {
 .navbar-ticker-wrap {
   justify-self: start;
   overflow: hidden;
-  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .search-box {
@@ -230,7 +231,6 @@ input {
 }
 
 .welcome-section {
-  background: linear-gradient(135deg, #ffffff, #f8fbff);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px;
@@ -1674,13 +1674,6 @@ tr:hover td {
   border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
-.welcome-section {
-  background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 34%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 251, 255, 0.92));
-  backdrop-filter: blur(16px);
-}
-
 .sidebar {
   background:
     radial-gradient(circle at top left, rgba(37, 99, 235, 0.2), transparent 28%),
@@ -1818,8 +1811,7 @@ tr:hover td {
 .dashboard-card,
 .stat-card,
 .pro-panel,
-.pro-kpi-card,
-.welcome-section {
+.pro-kpi-card {
   background: var(--glass-luxe) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -1848,34 +1840,43 @@ tr:hover td {
   border-color: var(--border-luxe-glow);
 }
 
-/* ───── WELCOME SECTION PREMIUM ───── */
+/* ───── WELCOME SECTION — consistently dark gradient across ALL pages ───── */
 .welcome-section {
   background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.10), transparent 40%),
-    radial-gradient(circle at bottom left, rgba(124, 58, 237, 0.06), transparent 35%),
-    var(--glass-luxe-strong);
-  box-shadow:
-    0 18px 50px rgba(15, 23, 42, 0.06),
-    0 4px 16px rgba(15, 23, 42, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-/* ───── STOCK DETAILS HERO — dark gradient for white text contrast ───── */
-.stock-details-hero {
-  background:
-    radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.35), transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.25), transparent 40%),
-    radial-gradient(circle at 60% 80%, rgba(16, 185, 129, 0.10), transparent 35%),
-    linear-gradient(135deg, #0f172a, #1e293b, #0f172a) !important;
+    radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.35), transparent 50%),
+    radial-gradient(circle at 85% 15%, rgba(124, 58, 237, 0.22), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.08), transparent 35%),
+    linear-gradient(135deg, #0f172a, #1e293b, #111827) !important;
   box-shadow:
     0 24px 80px rgba(15, 23, 42, 0.25),
     0 4px 16px rgba(15, 23, 42, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  color: #e2e8f0 !important;
 }
 
-.stock-details-hero h1,
-.stock-details-hero .pro-eyebrow {
+/* ── All text inside welcome sections — bright, readable on dark bg ── */
+.welcome-section h1,
+.welcome-section h1 * {
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+  color: #ffffff !important;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-section .pro-eyebrow {
+  color: #93c5fd !important;
+  -webkit-text-fill-color: #93c5fd !important;
+}
+
+.welcome-section p {
+  color: #dbeafe !important;
+  -webkit-text-fill-color: #dbeafe !important;
+}
+
+.welcome-section .status-pill {
+  color: #e2e8f0;
 }
 
 /* ───── NAVBAR PREMIUM ───── */

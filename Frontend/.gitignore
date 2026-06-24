@@ -28,3 +28,8 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Zip / generated files
+*.zip
+.commandcode/
+$null

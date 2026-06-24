@@ -245,8 +245,7 @@ body {
 .dashboard-card,
 .stat-card,
 .pro-panel,
-.pro-kpi-card,
-.welcome-section {
+.pro-kpi-card {
   background: var(--pro-glass-strong) !important;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -1382,10 +1381,6 @@ textarea:focus {
 
 /* ───── WELCOME SECTION ───── */
 .welcome-section {
-  background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 38%),
-    radial-gradient(circle at bottom left, rgba(124, 58, 237, 0.05), transparent 32%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 251, 255, 0.92)) !important;
   border-radius: var(--radius-lg, 18px);
   padding: 24px;
   margin-bottom: 24px;
