@@ -21,7 +21,10 @@ router = APIRouter(
 
 @router.on_event("startup")
 async def startup_realtime_service():
-    market_stream.start()
+    try:
+        market_stream.start()
+    except Exception as e:
+        print(f"Market stream startup skipped (not available in this environment): {e}")
 
 
 @router.on_event("shutdown")
