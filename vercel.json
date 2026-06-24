@@ -1,8 +1,12 @@
 {
   "buildCommand": "cd Frontend && npm run build",
   "outputDirectory": "Frontend/dist",
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.12"
+    }
+  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
