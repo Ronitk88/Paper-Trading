@@ -1,1 +1,21 @@
--r backend/requirements.txt
+fastapi
+uvicorn
+sqlalchemy
+python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-multipart
+email-validator
+requests
+pyotp
+smartapi-python
+alembic
+twilio
+aiohttp
+websocket-client
+websockets
+reportlab
+cryptography
+google-auth
+psycopg2-binary
