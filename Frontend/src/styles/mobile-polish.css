@@ -1,0 +1,265 @@
+/* =========================
+   FINAL MOBILE POLISH
+========================= */
+
+@media (max-width: 1100px) {
+  .professional-dashboard {
+    max-width: 100%;
+  }
+
+  .pro-dashboard-grid,
+  .pro-dashboard-grid.large-left,
+  .middle-grid,
+  .bottom-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pro-panel,
+  .table-card,
+  .dashboard-card {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    position: relative;
+    padding: 16px;
+  }
+
+  .logo {
+    margin-bottom: 16px;
+  }
+
+  .sidebar ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .sidebar li {
+    margin-bottom: 0;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .sidebar-footer {
+    margin-top: 16px;
+  }
+
+  .cash-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .navbar {
+    height: auto;
+    padding: 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .navbar > div:last-child {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-box {
+    width: 100%;
+    max-width: none;
+    order: 3;
+  }
+
+  .market-strip {
+    width: 100%;
+    margin: 0;
+    order: 2;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .dashboard-content {
+    padding: 16px;
+  }
+
+  .pro-dashboard-hero {
+    padding: 22px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pro-dashboard-hero h1 {
+    font-size: 26px;
+  }
+
+  .pro-hero-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-cards,
+  .pro-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+
+  .pro-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 650px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .dashboard-cards,
+  .pro-kpi-grid,
+  .sidebar ul {
+    grid-template-columns: 1fr;
+  }
+
+  .cash-box {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-section,
+  .table-card,
+  .dashboard-card,
+  .pro-panel,
+  .stat-card,
+  .pro-kpi-card {
+    border-radius: 16px;
+    padding: 18px;
+  }
+
+  .welcome-section h1,
+  .pro-dashboard-hero h1 {
+    font-size: 24px;
+    line-height: 1.2;
+  }
+
+  .pro-dashboard-hero p,
+  .welcome-section p {
+    font-size: 14px;
+  }
+
+  .market-strip span {
+    white-space: nowrap;
+  }
+
+  .primary-action,
+  .danger-action,
+  .warning-action,
+  .buy-btn,
+  .watch-btn,
+  .logout-btn {
+    width: 100%;
+  }
+
+  .pro-status-card {
+    width: 100%;
+  }
+
+  .market-card-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .info-value {
+    text-align: left;
+  }
+
+  table,
+  .pro-table {
+    min-width: 760px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .toast-container {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+  }
+
+  .professional-modal {
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-actions {
+    padding: 18px;
+  }
+}
+
+/* ─── Order Timeline ─── */
+@media (max-width: 900px) {
+  table td:last-child .order-timeline {
+    flex-direction: column;
+    gap: 12px;
+  }
+  table td:last-child .order-timeline > div {
+    min-width: auto;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+  }
+  table td:last-child .order-timeline > div > div:last-child {
+    text-align: left;
+  }
+}
+
+/* ─── Watchlist Live Prices ─── */
+.live-price-up { color: #16a34a; }
+.live-price-down { color: #dc2626; }
+.live-price-flash {
+  animation: flashPrice 0.6s ease;
+}
+@keyframes flashPrice {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* ─── Recently Viewed ─── */
+.recent-stock-card {
+  transition: all 0.15s ease;
+}
+.recent-stock-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}

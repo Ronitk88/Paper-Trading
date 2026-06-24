@@ -1,0 +1,1032 @@
+/* ════════════════════════════════════════════════════════════
+   LUXURY ANIMATION SYSTEM
+   Premium micro-interactions, entrance animations, floating
+   ambient elements, and buttery-smooth transitions.
+   ════════════════════════════════════════════════════════════ */
+
+/* ───── UTILITY CURVES ───── */
+:root {
+  --luxe-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --luxe-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --luxe-ease-in: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  --luxe-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ───── AMBIENT FLOATING ORBS ───── */
+.ambient-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+  animation: orbFloat 20s var(--luxe-ease) infinite;
+}
+
+.ambient-orb--blue {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #2563eb, transparent 70%);
+  top: -200px;
+  left: -150px;
+  animation-duration: 22s;
+}
+
+.ambient-orb--purple {
+  width: 440px;
+  height: 440px;
+  background: radial-gradient(circle, #7c3aed, transparent 70%);
+  bottom: -180px;
+  right: -120px;
+  animation-duration: 26s;
+  animation-delay: -8s;
+}
+
+.ambient-orb--green {
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, #16a34a, transparent 70%);
+  bottom: 40%;
+  left: -160px;
+  animation-duration: 28s;
+  animation-delay: -14s;
+}
+
+@keyframes orbFloat {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(60px, -80px) scale(1.08);
+  }
+  50% {
+    transform: translate(-30px, -40px) scale(0.92);
+  }
+  75% {
+    transform: translate(40px, 60px) scale(1.04);
+  }
+}
+
+/* ───── AMBIENT FLOATING PARTICLES ───── */
+.particles-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.25);
+  animation: particleDrift var(--duration, 12s) var(--luxe-ease) infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+}
+
+@keyframes particleDrift {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) translateX(var(--drift, 40px)) scale(1);
+    opacity: 0;
+  }
+}
+
+/* ───── SIDEBAR STAGGERED ENTRANCE ───── */
+.sidebar ul li {
+  animation: sidebarItemIn 0.5s var(--luxe-ease) both;
+}
+
+.sidebar ul li:nth-child(1) { animation-delay: 0.02s; }
+.sidebar ul li:nth-child(2) { animation-delay: 0.05s; }
+.sidebar ul li:nth-child(3) { animation-delay: 0.08s; }
+.sidebar ul li:nth-child(4) { animation-delay: 0.11s; }
+.sidebar ul li:nth-child(5) { animation-delay: 0.14s; }
+.sidebar ul li:nth-child(6) { animation-delay: 0.17s; }
+.sidebar ul li:nth-child(7) { animation-delay: 0.20s; }
+.sidebar ul li:nth-child(8) { animation-delay: 0.23s; }
+.sidebar ul li:nth-child(9) { animation-delay: 0.25s; }
+.sidebar ul li:nth-child(10) { animation-delay: 0.27s; }
+.sidebar ul li:nth-child(11) { animation-delay: 0.29s; }
+.sidebar ul li:nth-child(12) { animation-delay: 0.31s; }
+.sidebar ul li:nth-child(13) { animation-delay: 0.33s; }
+.sidebar ul li:nth-child(14) { animation-delay: 0.35s; }
+
+@keyframes sidebarItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* ───── SIDEBAR ACTIVE INDICATOR ───── */
+.sidebar li.active::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  border-radius: 4px 0 0 4px;
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  animation: activeGlow 2.5s var(--luxe-ease) infinite;
+}
+
+@keyframes activeGlow {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 6px rgba(37, 99, 235, 0.4);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 14px rgba(37, 99, 235, 0.7), 0 0 30px rgba(37, 99, 235, 0.2);
+  }
+}
+
+/* ───── SIDEBAR CASH BOX SUBTLE PULSE ───── */
+.cash-box {
+  animation: cashPulse 4s var(--luxe-ease) infinite;
+}
+
+@keyframes cashPulse {
+  0%,
+  100% {
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  50% {
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 20px rgba(37, 99, 235, 0.08);
+  }
+}
+
+/* ───── PAGE CONTENT STAGGERED ENTRANCE ───── */
+.dashboard-content > * {
+  animation: contentFadeIn 0.55s var(--luxe-ease-out) both;
+}
+
+.dashboard-content > *:nth-child(1) { animation-delay: 0.02s; }
+.dashboard-content > *:nth-child(2) { animation-delay: 0.06s; }
+.dashboard-content > *:nth-child(3) { animation-delay: 0.10s; }
+.dashboard-content > *:nth-child(4) { animation-delay: 0.14s; }
+.dashboard-content > *:nth-child(5) { animation-delay: 0.18s; }
+.dashboard-content > *:nth-child(6) { animation-delay: 0.22s; }
+.dashboard-content > *:nth-child(7) { animation-delay: 0.26s; }
+.dashboard-content > *:nth-child(8) { animation-delay: 0.30s; }
+.dashboard-content > *:nth-child(9) { animation-delay: 0.34s; }
+.dashboard-content > *:nth-child(10) { animation-delay: 0.38s; }
+.dashboard-content > *:nth-child(11) { animation-delay: 0.42s; }
+.dashboard-content > *:nth-child(12) { animation-delay: 0.46s; }
+.dashboard-content > *:nth-child(13) { animation-delay: 0.50s; }
+.dashboard-content > *:nth-child(14) { animation-delay: 0.54s; }
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ───── KPI CARDS STAGGER ───── */
+.pro-kpi-grid > * {
+  animation: cardFadeUp 0.5s var(--luxe-ease-out) both;
+}
+
+.pro-kpi-grid > *:nth-child(1) { animation-delay: 0.04s; }
+.pro-kpi-grid > *:nth-child(2) { animation-delay: 0.09s; }
+.pro-kpi-grid > *:nth-child(3) { animation-delay: 0.14s; }
+.pro-kpi-grid > *:nth-child(4) { animation-delay: 0.19s; }
+
+.dashboard-cards > * {
+  animation: cardFadeUp 0.45s var(--luxe-ease-out) both;
+}
+
+.dashboard-cards > *:nth-child(1) { animation-delay: 0.03s; }
+.dashboard-cards > *:nth-child(2) { animation-delay: 0.07s; }
+.dashboard-cards > *:nth-child(3) { animation-delay: 0.11s; }
+.dashboard-cards > *:nth-child(4) { animation-delay: 0.15s; }
+.dashboard-cards > *:nth-child(5) { animation-delay: 0.19s; }
+.dashboard-cards > *:nth-child(6) { animation-delay: 0.23s; }
+
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ───── TABLE ROW STAGGERED ENTRANCE ───── */
+.pro-table tbody tr,
+table tbody tr {
+  animation: rowFadeIn 0.35s var(--luxe-ease-out) both;
+}
+
+.pro-table tbody tr:nth-child(1),
+table tbody tr:nth-child(1) { animation-delay: 0.015s; }
+.pro-table tbody tr:nth-child(2),
+table tbody tr:nth-child(2) { animation-delay: 0.035s; }
+.pro-table tbody tr:nth-child(3),
+table tbody tr:nth-child(3) { animation-delay: 0.055s; }
+.pro-table tbody tr:nth-child(4),
+table tbody tr:nth-child(4) { animation-delay: 0.075s; }
+.pro-table tbody tr:nth-child(5),
+table tbody tr:nth-child(5) { animation-delay: 0.095s; }
+.pro-table tbody tr:nth-child(6),
+table tbody tr:nth-child(6) { animation-delay: 0.115s; }
+.pro-table tbody tr:nth-child(7),
+table tbody tr:nth-child(7) { animation-delay: 0.135s; }
+.pro-table tbody tr:nth-child(8),
+table tbody tr:nth-child(8) { animation-delay: 0.155s; }
+.pro-table tbody tr:nth-child(9),
+table tbody tr:nth-child(9) { animation-delay: 0.175s; }
+.pro-table tbody tr:nth-child(10),
+table tbody tr:nth-child(10) { animation-delay: 0.195s; }
+.pro-table tbody tr:nth-child(11),
+table tbody tr:nth-child(11) { animation-delay: 0.215s; }
+.pro-table tbody tr:nth-child(12),
+table tbody tr:nth-child(12) { animation-delay: 0.235s; }
+
+@keyframes rowFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ───── BUTTON SHINE OVERLAY ───── */
+.primary-action,
+.danger-action,
+.warning-action,
+.buy-btn,
+.watch-btn,
+.logout-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.primary-action::before,
+.danger-action::before,
+.warning-action::before,
+.buy-btn::before,
+.watch-btn::before,
+.logout-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 47%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.3) 53%,
+    transparent 75%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
+  transition: background-position 0.6s var(--luxe-ease);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.primary-action:hover::before,
+.danger-action:hover::before,
+.warning-action:hover::before,
+.buy-btn:hover::before,
+.watch-btn:hover::before,
+.logout-btn:hover::before {
+  background-position: -50% 0;
+}
+
+/* ───── BUTTON CLICK RIPPLE ───── */
+.primary-action:active,
+.danger-action:active,
+.warning-action:active,
+.buy-btn:active,
+.watch-btn:active,
+.logout-btn:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.1s var(--luxe-ease);
+}
+
+/* ───── TOAST SLIDE IN / OUT ───── */
+.toast {
+  animation: toastSlideIn 0.38s var(--luxe-spring) both;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(70px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.toast-removing {
+  animation: toastSlideOut 0.28s var(--luxe-ease-in) both;
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(50px) scale(0.92);
+  }
+}
+
+/* ───── MODAL ENTRIES ───── */
+.modal-backdrop {
+  animation: modalOverlayIn 0.25s var(--luxe-ease) both;
+}
+
+@keyframes modalOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.professional-modal {
+  animation: modalIn 0.4s var(--luxe-spring) both;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ───── SKELETON LOADER SHIMMER ───── */
+.skeleton-line {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 25%,
+    #eef4ff 50%,
+    #f1f5f9 75%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: skeletonShimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ───── LIVE PRICE FLASH ───── */
+.price-flash-up {
+  animation: priceFlashGreen 0.5s var(--luxe-ease);
+}
+
+.price-flash-down {
+  animation: priceFlashRed 0.5s var(--luxe-ease);
+}
+
+@keyframes priceFlashGreen {
+  0% { background-color: rgba(22, 163, 74, 0.18); }
+  100% { background-color: transparent; }
+}
+
+@keyframes priceFlashRed {
+  0% { background-color: rgba(220, 38, 38, 0.18); }
+  100% { background-color: transparent; }
+}
+
+/* ───── PENDING STATUS PULSE ───── */
+.status-pill.status-warning {
+  animation: pendingPulse 2.5s var(--luxe-ease) infinite;
+}
+
+@keyframes pendingPulse {
+  0%,
+  100% {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      0 0 14px rgba(202, 138, 4, 0.28),
+      0 0 28px rgba(202, 138, 4, 0.12);
+  }
+}
+
+/* ───── MARKET OPEN PULSE ───── */
+.market-open-indicator .status-success {
+  animation: marketPulse 2s var(--luxe-ease) infinite;
+}
+
+@keyframes marketPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(22, 163, 74, 0);
+  }
+}
+
+/* ───── HERO SECTION SUBTLE GLOW ───── */
+.stock-details-hero {
+  animation: heroGlow 5s var(--luxe-ease) infinite;
+}
+
+@keyframes heroGlow {
+  0%,
+  100% {
+    box-shadow: 0 30px 90px rgba(15, 23, 42, 0.28);
+  }
+  50% {
+    box-shadow:
+      0 30px 110px rgba(37, 99, 235, 0.12),
+      0 30px 90px rgba(15, 23, 42, 0.28);
+  }
+}
+
+/* ───── SEARCH INPUT FOCUS GLOW ───── */
+.search-box input:focus {
+  animation: searchGlow 2.5s var(--luxe-ease) infinite;
+}
+
+@keyframes searchGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 4px rgba(37, 99, 235, 0.12),
+      0 12px 30px rgba(37, 99, 235, 0.08);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(37, 99, 235, 0.08),
+      0 12px 30px rgba(37, 99, 235, 0.14);
+  }
+}
+
+/* ───── WELCOME SECTION GRADIENT SHIFT ───── */
+.welcome-section {
+  animation: gradientShift 7s var(--luxe-ease) infinite;
+}
+
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ───── NAVBAR DROPDOWN SMOOTH ENTRANCE ───── */
+[style*="position: absolute"][style*="top: 52px"] {
+  animation: dropdownIn 0.25s var(--luxe-ease-out) both;
+  transform-origin: top right;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ───── AL LOCATION BAR SMOOTH TRANSITION ───── */
+.allocation-fill {
+  transition: width 0.8s var(--luxe-ease-out);
+}
+
+/* ───── NAVIGATION LINK HOVER SUBTLE ───── */
+.sidebar li {
+  transition: all 0.25s var(--luxe-ease-out);
+}
+
+.sidebar li:hover {
+  transform: translateX(4px);
+}
+
+/* ───── CARD HOVER ELEVATION ───── */
+.table-card,
+.dashboard-card,
+.stat-card,
+.pro-panel,
+.pro-kpi-card {
+  transition:
+    transform 0.3s var(--luxe-ease-out),
+    box-shadow 0.3s var(--luxe-ease-out),
+    border-color 0.3s var(--luxe-ease-out);
+}
+
+.table-card:hover,
+.dashboard-card:hover,
+.pro-panel:hover,
+.pro-kpi-card:hover {
+  transform: translateY(-4px);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+/* ───── MARKET CARD ITEM HOVER ───── */
+.market-card-item {
+  transition:
+    transform 0.25s var(--luxe-ease-out),
+    box-shadow 0.25s var(--luxe-ease-out),
+    border-color 0.25s var(--luxe-ease-out);
+}
+
+.market-card-item:hover {
+  transform: translateY(-3px);
+}
+
+/* ───── NAVBAR SEARCH SUGGESTIONS ───── */
+.search-suggestion {
+  transition: background 0.18s var(--luxe-ease);
+}
+
+/* ───── ALLOCATION ROW ───── */
+.allocation-row {
+  transition: transform 0.2s var(--luxe-ease);
+}
+
+.allocation-row:hover {
+  transform: translateX(4px);
+}
+
+/* ───── PRICE CHANGE FADE ───── */
+.pro-positive,
+.pro-negative {
+  transition: color 0.3s var(--luxe-ease);
+}
+
+/* ───── FLOATING AMBIENT GLOW ON LOGIN PAGE ───── */
+@keyframes loginOrbFloat {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.75;
+  }
+  33% {
+    transform: translate(40px, -60px) scale(1.1);
+    opacity: 0.85;
+  }
+  66% {
+    transform: translate(-20px, 30px) scale(0.9);
+    opacity: 0.65;
+  }
+}
+
+.login-bg-orb {
+  animation: loginOrbFloat 18s var(--luxe-ease) infinite;
+}
+
+.orb-two {
+  animation-delay: -9s;
+}
+
+/* ───── LOGIN CARD ENTRANCE ───── */
+.login-pro-card {
+  animation: loginCardIn 0.6s var(--luxe-spring) both;
+}
+
+@keyframes loginCardIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* ───── LOGIN LEFT CONTENT ENTRANCE ───── */
+.login-pro-left {
+  animation: loginLeftIn 0.7s var(--luxe-ease-out) both;
+}
+
+@keyframes loginLeftIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── LOGIN BADGE ───── */
+.login-badge {
+  animation: badgeIn 0.5s var(--luxe-spring) both;
+  animation-delay: 0.15s;
+}
+
+@keyframes badgeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ───── LOGIN FEATURE CARDS STAGGER ───── */
+.login-market-card > *,
+.login-feature-grid > * {
+  animation: featureCardIn 0.5s var(--luxe-ease-out) both;
+}
+
+.login-market-card > *:nth-child(1) { animation-delay: 0.25s; }
+.login-market-card > *:nth-child(2) { animation-delay: 0.35s; }
+
+.login-feature-grid > *:nth-child(1) { animation-delay: 0.30s; }
+.login-feature-grid > *:nth-child(2) { animation-delay: 0.40s; }
+.login-feature-grid > *:nth-child(3) { animation-delay: 0.50s; }
+
+@keyframes featureCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ───── BUTTON GROUP SLIDE ───── */
+.login-switch button,
+.login-method-grid button {
+  transition: all 0.25s var(--luxe-ease-out);
+}
+
+.login-switch button.active,
+.login-method-grid button.active {
+  animation: activeTabPop 0.35s var(--luxe-spring);
+}
+
+@keyframes activeTabPop {
+  from {
+    transform: scale(0.92);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ───── FORM INPUT FOCUS ANIMATION ───── */
+.login-input {
+  transition:
+    border-color 0.2s var(--luxe-ease),
+    box-shadow 0.2s var(--luxe-ease),
+    transform 0.2s var(--luxe-ease);
+}
+
+.login-input:focus {
+  transform: translateY(-1px);
+}
+
+/* ───── SUBMIT BUTTON ───── */
+.login-main-btn {
+  transition:
+    transform 0.25s var(--luxe-ease-out),
+    box-shadow 0.25s var(--luxe-ease-out),
+    filter 0.25s var(--luxe-ease);
+}
+
+.login-main-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.login-main-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ───── TOAST CONTAINER STAGGER ───── */
+.toast-container {
+  animation: toastContainerIn 0.3s var(--luxe-ease-out) both;
+}
+
+/* ───── SCROLLBAR ANIMATION ───── */
+::-webkit-scrollbar-thumb {
+  transition: background 0.3s var(--luxe-ease);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #64748b, #475569) !important;
+}
+
+/* ───── MODAL CLOSE BUTTON ───── */
+.modal-close {
+  transition:
+    transform 0.2s var(--luxe-ease),
+    background 0.2s var(--luxe-ease);
+}
+
+.modal-close:hover {
+  transform: rotate(90deg);
+  background: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* ───── CASH BOOTOM SECTION ENTRANCE ───── */
+.sidebar-footer {
+  animation: footerIn 0.5s var(--luxe-ease-out) both;
+  animation-delay: 0.3s;
+}
+
+@keyframes footerIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── LOGO ENTRANCE ───── */
+.logo {
+  animation: logoIn 0.5s var(--luxe-spring) both;
+}
+
+@keyframes logoIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* ───── USER AVATAR ───── */
+.avatar {
+  transition:
+    transform 0.25s var(--luxe-ease),
+    box-shadow 0.25s var(--luxe-ease);
+}
+
+.user-box-clickable:hover .avatar {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* ───── NOTIFICATION BELL ───── */
+@keyframes bellRing {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  10%,
+  30% {
+    transform: rotate(8deg);
+  }
+  20%,
+  40% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+}
+
+.navbar button[title="Notification services"]:hover svg {
+  animation: bellRing 0.8s var(--luxe-ease);
+}
+
+/* ───── HEADER GREETING ───── */
+.pro-dashboard-hero h1 {
+  animation: greetingIn 0.6s var(--luxe-spring) both;
+  animation-delay: 0.1s;
+}
+
+@keyframes greetingIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ───── EYEBROW TEXT ───── */
+.pro-eyebrow {
+  animation: eyebrowIn 0.4s var(--luxe-ease-out) both;
+}
+
+@keyframes eyebrowIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── KPI VALUE COUNT-UP GLOW ───── */
+.pro-kpi-card h2 {
+  animation: valueGlow 1s var(--luxe-ease-out) both;
+  animation-delay: 0.3s;
+}
+
+@keyframes valueGlow {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* ───── PROGRESS BAR SMOOTH ───── */
+.allocation-bar {
+  overflow: hidden;
+}
+
+.allocation-fill {
+  position: relative;
+}
+
+.allocation-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  animation: barShimmer 3s var(--luxe-ease) infinite;
+}
+
+@keyframes barShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ───── ACTIVITY GRID CARDS ───── */
+.activity-grid div {
+  transition:
+    transform 0.25s var(--luxe-ease-out),
+    box-shadow 0.25s var(--luxe-ease-out),
+    border-color 0.25s var(--luxe-ease-out);
+}
+
+.activity-grid div:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.18);
+}
+
+/* ───── FOOTER NOTE ───── */
+.footer-note {
+  animation: footerNoteIn 0.5s var(--luxe-ease-out) both;
+  animation-delay: 0.4s;
+}
+
+@keyframes footerNoteIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   TICKER SCROLL — smooth continuous horizontal scroll
+   ════════════════════════════════════════════════════════════ */
+
+.ticker-scroll-wrap {
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 40px,
+    black calc(100% - 40px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 40px,
+    black calc(100% - 40px),
+    transparent 100%
+  );
+}
+
+.ticker-scroll-track {
+  display: flex;
+  width: max-content;
+  animation: tickerScroll 40s linear infinite;
+}
+
+.ticker-scroll-track:hover {
+  animation-play-state: paused;
+}
+
+.ticker-scroll-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-right: 8px;
+}
+
+.ticker-scroll-item {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: #1e293b;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ticker-scroll-item:hover {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+
+@keyframes tickerScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

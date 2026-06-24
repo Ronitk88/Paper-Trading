@@ -1,0 +1,862 @@
+/* ════════════════════════════════════════════════════════════
+   PREMIUM LOGIN ANIMATIONS & ENHANCEMENTS
+   Ambient floating particles, form micro-interactions, luxury.
+   ════════════════════════════════════════════════════════════ */
+
+:root {
+  --login-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --login-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ───── AMBIENT FLOATING PARTICLES ON LOGIN ───── */
+.login-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.login-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  animation: loginParticleFloat var(--duration, 15s) var(--login-ease) infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+}
+
+@keyframes loginParticleFloat {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-10vh) translateX(var(--drift, 50px)) scale(1);
+    opacity: 0;
+  }
+}
+
+/* ───── LOGIN CARD ENTRANCE ───── */
+.login-pro-card {
+  animation: loginCardSlideIn 0.7s var(--login-spring) both;
+}
+
+@keyframes loginCardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* ───── LOGIN LEFT HERO ───── */
+.login-pro-left {
+  animation: loginHeroIn 0.8s var(--login-ease) both;
+}
+
+@keyframes loginHeroIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── BADGE STAGGER ───── */
+.login-badge {
+  animation: badgeSlideIn 0.5s var(--login-spring) both;
+  animation-delay: 0.15s;
+}
+
+@keyframes badgeSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ───── HEADING FADE ───── */
+.login-pro-left h1 {
+  animation: headingFadeIn 0.6s var(--login-ease) both;
+  animation-delay: 0.2s;
+}
+
+@keyframes headingFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── SUBTEXT ───── */
+.login-pro-left p {
+  animation: subtextIn 0.6s var(--login-ease) both;
+  animation-delay: 0.3s;
+}
+
+@keyframes subtextIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── MARKET CARDS STAGGER ───── */
+.login-market-card > * {
+  animation: marketCardIn 0.5s var(--login-spring) both;
+}
+
+.login-market-card > *:nth-child(1) { animation-delay: 0.35s; }
+.login-market-card > *:nth-child(2) { animation-delay: 0.45s; }
+
+@keyframes marketCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ───── FEATURE GRID STAGGER ───── */
+.login-feature-grid > * {
+  animation: featureIn 0.5s var(--login-spring) both;
+}
+
+.login-feature-grid > *:nth-child(1) { animation-delay: 0.40s; }
+.login-feature-grid > *:nth-child(2) { animation-delay: 0.50s; }
+.login-feature-grid > *:nth-child(3) { animation-delay: 0.60s; }
+
+@keyframes featureIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ───── CARD HEADER ───── */
+.login-card-header {
+  animation: cardHeaderIn 0.5s var(--login-ease) both;
+  animation-delay: 0.1s;
+}
+
+@keyframes cardHeaderIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── TAB SWITCHER ───── */
+.login-switch,
+.login-method-grid {
+  animation: tabGroupIn 0.5s var(--login-ease) both;
+  animation-delay: 0.2s;
+}
+
+@keyframes tabGroupIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── ACTIVE TAB POP ───── */
+.login-switch button.active,
+.login-method-grid button.active {
+  animation: activeTabPop 0.35s var(--login-spring);
+}
+
+@keyframes activeTabPop {
+  from {
+    transform: scale(0.92);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ───── GOOGLE LOGIN BOX ───── */
+.google-login-box {
+  animation: googleBoxIn 0.5s var(--login-ease) both;
+  animation-delay: 0.25s;
+}
+
+@keyframes googleBoxIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── DIVIDER ───── */
+.login-divider {
+  animation: dividerIn 0.4s var(--login-ease) both;
+  animation-delay: 0.3s;
+}
+
+@keyframes dividerIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* ───── FORM STAGGER ───── */
+form {
+  animation: formIn 0.5s var(--login-ease) both;
+  animation-delay: 0.3s;
+}
+
+@keyframes formIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───── INPUT LABEL ───── */
+.login-label {
+  display: block;
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: #334155;
+  font-size: 14px;
+  transition: color 0.2s var(--login-ease);
+}
+
+/* ───── INPUT FIELD LUXURY ───── */
+.login-input {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  font-size: 15px;
+  background: white;
+  transition:
+    border-color 0.25s var(--login-ease),
+    box-shadow 0.25s var(--login-ease),
+    transform 0.25s var(--login-ease);
+}
+
+.login-input:focus {
+  border-color: #2563eb;
+  box-shadow:
+    0 0 0 4px rgba(37, 99, 235, 0.08),
+    0 8px 24px rgba(37, 99, 235, 0.06);
+  transform: translateY(-1px);
+}
+
+.login-input:hover:not(:focus) {
+  border-color: #94a3b8;
+}
+
+/* ───── MAIN SUBMIT BUTTON ───── */
+.login-main-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8, #2563eb);
+  background-size: 200% 100%;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow:
+    0 18px 38px rgba(37, 99, 235, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition:
+    transform 0.25s var(--login-ease),
+    box-shadow 0.25s var(--login-ease),
+    background-position 0.5s var(--login-ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-main-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 24px 50px rgba(37, 99, 235, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background-position: 100% 0;
+}
+
+.login-main-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.login-main-btn:disabled {
+  background: #94a3b8;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ───── FORGOT PASSWORD LINK ───── */
+.login-forgot-link {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 16px;
+  transition:
+    color 0.2s var(--login-ease),
+    transform 0.2s var(--login-ease);
+}
+
+.login-forgot-link:hover {
+  color: #1d4ed8;
+  transform: translateX(2px);
+}
+
+/* ───── OTP BOX ───── */
+.otp-box {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 16px;
+  transition:
+    border-color 0.3s var(--login-ease),
+    background 0.3s var(--login-ease);
+}
+
+.otp-box.verified {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border-color: #86efac;
+  animation: otpVerifiedPop 0.4s var(--login-spring);
+}
+
+@keyframes otpVerifiedPop {
+  from {
+    transform: scale(0.96);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.otp-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.otp-header strong {
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.otp-header p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.otp-header button,
+.otp-input-row button {
+  border: none;
+  border-radius: 11px;
+  padding: 10px 16px;
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    transform 0.2s var(--login-ease),
+    box-shadow 0.2s var(--login-ease),
+    background 0.2s var(--login-ease);
+}
+
+.otp-header button:not(:disabled):hover,
+.otp-input-row button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.otp-header button:not(:disabled):active,
+.otp-input-row button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+.otp-header button:disabled,
+.otp-input-row button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.otp-header button {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+}
+
+.otp-header button:hover:not(:disabled) {
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.20);
+}
+
+.otp-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-top: 12px;
+  animation: otpRowSlide 0.3s var(--login-ease) both;
+}
+
+@keyframes otpRowSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.otp-input-row input {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  font-size: 15px;
+  letter-spacing: 4px;
+  font-weight: 900;
+  transition:
+    border-color 0.2s var(--login-ease),
+    box-shadow 0.2s var(--login-ease);
+}
+
+.otp-input-row input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.otp-input-row button {
+  background: #16a34a;
+  color: white;
+  box-shadow: 0 8px 20px rgba(22, 163, 74, 0.15);
+}
+
+.otp-input-row button:hover:not(:disabled) {
+  box-shadow: 0 12px 28px rgba(22, 163, 74, 0.20);
+}
+
+/* ───── RISK NOTE ───── */
+.login-risk-note {
+  margin-top: 22px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border: 1px solid #e5e7eb;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.7;
+  text-align: center;
+  animation: riskNoteIn 0.5s var(--login-ease) both;
+  animation-delay: 0.4s;
+}
+
+@keyframes riskNoteIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-risk-note strong {
+  color: #0f172a;
+}
+
+/* ───── ORB ENHANCEMENT ───── */
+.login-bg-orb {
+  transition: transform 0.1s linear;
+}
+
+/* ───── RESPONSIVE ───── */
+@media (max-width: 1150px) {
+  .login-pro-page {
+    grid-template-columns: 1fr;
+    padding: 34px;
+  }
+
+  .login-pro-card {
+    max-width: 560px;
+    justify-self: center;
+  }
+
+  .login-pro-left {
+    text-align: center;
+  }
+
+  .login-pro-left p {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .login-market-card,
+  .login-feature-grid {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .login-pro-page {
+    padding: 20px;
+  }
+
+  .login-pro-left h1 {
+    font-size: 38px;
+  }
+
+  .login-market-card,
+  .login-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .login-pro-card {
+    padding: 24px;
+    max-height: none;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   PREMIUM ENHANCEMENTS — EXPERT EDITION
+   Sophisticated micro-interactions, ambient depth, pro polish.
+   ════════════════════════════════════════════════════════════ */
+
+/* ───── ANIMATED GRADIENT BACKGROUND SHIFT ───── */
+.login-pro-page {
+  animation: bgShift 12s var(--login-ease) infinite alternate;
+}
+
+@keyframes bgShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 50% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ───── AMBIENT ORB FLOAT & GLOW ───── */
+.orb-one {
+  animation: orbDriftOne 14s var(--login-ease) infinite alternate;
+}
+
+.orb-two {
+  animation: orbDriftTwo 16s var(--login-ease) infinite alternate;
+  animation-delay: -7s;
+}
+
+@keyframes orbDriftOne {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate(50px, 30px) scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+@keyframes orbDriftTwo {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-40px, -20px) scale(1.10);
+    opacity: 0.75;
+  }
+}
+
+/* ───── BADGE SUBTLE GLOW PULSE ───── */
+.login-badge {
+  animation: badgePulse 4s var(--login-ease) infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  }
+  50% {
+    box-shadow:
+      0 16px 40px rgba(0, 0, 0, 0.16),
+      0 0 24px rgba(59, 130, 246, 0.08);
+  }
+}
+
+/* ───── MARKET / FEATURE CARDS HOVER LIFT ───── */
+.login-market-card div,
+.login-feature-grid div {
+  transition:
+    transform 0.35s var(--login-ease),
+    box-shadow 0.35s var(--login-ease),
+    border-color 0.35s var(--login-ease),
+    background 0.35s var(--login-ease);
+  cursor: default;
+}
+
+.login-market-card div:hover,
+.login-feature-grid div:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.22),
+    0 0 40px rgba(59, 130, 246, 0.06);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ───── PREMIUM CARD EDGE GLOW ───── */
+.login-pro-card {
+  position: relative;
+}
+
+.login-pro-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 28px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35),
+    rgba(37, 99, 235, 0.08),
+    rgba(124, 58, 237, 0.08),
+    rgba(255, 255, 255, 0.35)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: cardBorderGlow 6s var(--login-ease) infinite alternate;
+}
+
+@keyframes cardBorderGlow {
+  0% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ───── CARD HEADER DIVIDER ───── */
+.login-card-header {
+  position: relative;
+  padding-bottom: 20px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.login-card-header p {
+  margin-top: 12px;
+}
+
+/* ───── GOOGLE LOGIN BOX ───── */
+.google-login-box {
+  transition:
+    border-color 0.3s var(--login-ease),
+    box-shadow 0.3s var(--login-ease),
+    background 0.3s var(--login-ease);
+}
+
+.google-login-box:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.04);
+  background: #ffffff;
+}
+
+/* ───── INPUT ENHANCEMENTS ───── */
+.login-input {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  background: #ffffff;
+}
+
+.login-input:focus {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ───── MAIN BUTTON ENHANCEMENTS ───── */
+.login-main-btn {
+  margin-top: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-main-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.2) 47%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.2) 53%,
+    transparent 75%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
+  transition: background-position 0.6s var(--login-ease);
+  pointer-events: none;
+}
+
+.login-main-btn:hover::after {
+  background-position: -50% 0;
+}
+
+/* ───── FORGOT PASSWORD ───── */
+.login-forgot-link {
+  position: relative;
+  display: inline-block;
+}
+
+.login-forgot-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  transition: width 0.3s var(--login-ease);
+}
+
+.login-forgot-link:hover::after {
+  width: 100%;
+}
+
+/* ───── RISK NOTE ───── */
+.login-risk-note {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-risk-note::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  border-radius: 3px 0 0 3px;
+}
+
+.login-risk-note strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* ───── SCROLLBAR ENHANCEMENTS ───── */
+.login-pro-card::-webkit-scrollbar {
+  width: 5px;
+}
+
+.login-pro-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.login-pro-card::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.login-pro-card::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ───── MODAL ENHANCEMENTS ───── */
+.professional-modal {
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+/* ───── RESPONSIVE TOUCH ───── */
+@media (max-width: 1150px) {
+  .login-pro-card::before {
+    display: none;
+  }
+}

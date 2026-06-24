@@ -1,0 +1,47 @@
+# ─── Environment / Secrets ───
+.env
+.env.*
+!.env.example
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+.venv/
+venv/
+env/
+
+# ─── Node ───
+node_modules/
+dist/
+build/
+.vite/
+
+# ─── Logs ───
+*.log
+logs/
+npm-debug.log*
+
+# ─── Database ───
+*.db
+*.sqlite
+*.sqlite3
+paper_trading.db
+
+# ─── IDE / OS ───
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ─── Testing / Coverage ───
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+
+# ─── Build ───
+*.egg-info/
+*.whl
