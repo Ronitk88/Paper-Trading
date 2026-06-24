@@ -16,4 +16,5 @@ aiohttp
 websocket-client
 websockets
 reportlab
+google-auth
 psycopg2-binary
