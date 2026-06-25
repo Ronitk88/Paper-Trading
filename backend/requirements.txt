@@ -1,5 +1,6 @@
+@"
 fastapi
-uvicorn
+uvicorn[standard]
 sqlalchemy
 python-dotenv
 python-jose[cryptography]
@@ -19,3 +20,4 @@ reportlab
 cryptography
 google-auth
 psycopg2-binary
+"@ | Set-Content -Path ".\backend\requirements.txt"
