@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db.database import SessionLocal
+from app.db.database import Base, engine, SessionLocal
 from app.services.stock_sync import sync_nse_bse_stocks_if_needed
 
 
@@ -16,7 +16,7 @@ ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
 
-# Import models for Alembic/model discovery
+# Import models so SQLAlchemy can create/discover all tables
 from app.models.user import User
 from app.models.portfolio import Portfolio
 from app.models.holding import Holding
@@ -30,12 +30,10 @@ from app.models.trade_journal import TradeJournal
 from app.models.password_reset import PasswordResetToken
 
 try:
-    # Import dynamically to avoid static import errors in some environments
     import importlib
 
     PhoneOTP = importlib.import_module("app.models.phone_otp").PhoneOTP
 except Exception:
-    # PhoneOTP model may not be present in some deployments; continue silently
     PhoneOTP = None
 
 
@@ -68,6 +66,7 @@ def get_allowed_origins():
     default_origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "https://paper-trading-7pd8.vercel.app",
     ]
 
     frontend_url = os.getenv("FRONTEND_URL")
@@ -102,6 +101,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def create_database_tables():
+    try:
+        print("Creating/checking database tables...")
+        Base.metadata.create_all(bind=engine)
+        print("Database tables ready.")
+    except Exception as e:
+        print("Database table creation failed:", e)
 
 
 def auto_sync_stock_master():
@@ -140,6 +148,8 @@ def health_check():
 
 @app.on_event("startup")
 def startup_tasks():
+    create_database_tables()
+
     auto_sync_enabled = os.getenv("AUTO_SYNC_STOCKS", "true").lower() == "true"
 
     if auto_sync_enabled:
@@ -149,12 +159,6 @@ def startup_tasks():
         )
 
         thread.start()
-
-
-# Tables are managed by Alembic migrations.
-# Run when schema changes:
-# alembic revision --autogenerate -m "message"
-# alembic upgrade head
 
 
 app.include_router(auth_router)
