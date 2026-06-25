@@ -1,4 +1,3 @@
-@"
 fastapi
 uvicorn[standard]
 sqlalchemy
@@ -20,4 +19,3 @@ reportlab
 cryptography
 google-auth
 psycopg2-binary
-"@ | Set-Content -Path ".\backend\requirements.txt"
