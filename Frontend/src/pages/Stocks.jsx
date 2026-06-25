@@ -47,7 +47,9 @@ function Stocks() {
   };
 
   const getStocksCacheKey = (pageNumber, searchValue, exchangeValue) => {
-    return `stocks_cache_v1_${pageNumber}_${exchangeValue}_${searchValue || ""}`;
+    return `stocks_cache_v1_${pageNumber}_${exchangeValue}_${
+      searchValue || ""
+    }`;
   };
 
   const saveStocksCache = (key, data) => {
@@ -120,7 +122,11 @@ function Stocks() {
 
   const loadStocks = useCallback(
     async (pageNumber = page, searchValue = search, exchangeValue = exchange) => {
-      const cacheKey = getStocksCacheKey(pageNumber, searchValue, exchangeValue);
+      const cacheKey = getStocksCacheKey(
+        pageNumber,
+        searchValue,
+        exchangeValue
+      );
 
       try {
         const cached = readStocksCache(cacheKey);
@@ -206,12 +212,8 @@ function Stocks() {
     setPage(1);
   };
 
-  const syncStocks = async () => {
+  const clearStocksCache = () => {
     try {
-      setSyncing(true);
-
-      const res = await api.post("/stocks/sync");
-
       sessionStorage.removeItem("stocks_stats_cache_v1");
 
       Object.keys(sessionStorage).forEach((key) => {
@@ -219,6 +221,18 @@ function Stocks() {
           sessionStorage.removeItem(key);
         }
       });
+    } catch {
+      // Ignore cache errors
+    }
+  };
+
+  const syncStocks = async () => {
+    try {
+      setSyncing(true);
+
+      const res = await api.post("/stocks/sync");
+
+      clearStocksCache();
 
       window.showToast?.(
         `${res.data.message || "Stock master refreshed"} · Total: ${
@@ -248,7 +262,9 @@ function Stocks() {
       window.showToast?.(`${stock.symbol} added to watchlist!`);
     } catch (err) {
       console.error("Watchlist add failed:", err);
-      window.showToast?.(err?.response?.data?.detail || "Failed to add to watchlist");
+      window.showToast?.(
+        err?.response?.data?.detail || "Failed to add to watchlist"
+      );
     }
   };
 
@@ -406,6 +422,7 @@ function Stocks() {
             <div className="stat-card">
               <h4>Selected Exchange</h4>
               <h2>{exchange}</h2>
+
               <p
                 style={{
                   margin: "10px 0 0",
@@ -434,6 +451,7 @@ function Stocks() {
             </div>
 
             <div
+              className="stocks-filter-grid"
               style={{
                 display: "grid",
                 gridTemplateColumns: "minmax(0, 1fr) 190px",
@@ -531,6 +549,7 @@ function Stocks() {
 
           <div className="table-card" style={{ marginTop: "24px" }}>
             <div
+              className="stock-master-header"
               style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -554,6 +573,7 @@ function Stocks() {
               </div>
 
               <div
+                className="stock-pagination-actions"
                 style={{
                   display: "flex",
                   gap: "10px",
@@ -582,6 +602,7 @@ function Stocks() {
                     border: "1px solid #e5e7eb",
                     padding: "10px 14px",
                     borderRadius: "12px",
+                    textAlign: "center",
                   }}
                 >
                   {page} / {pagination.total_pages}
@@ -610,6 +631,7 @@ function Stocks() {
             {!loading && stocks.length === 0 ? (
               <div className="empty-state">
                 <h3>No stocks found</h3>
+
                 <p>
                   Try another symbol/company name, change exchange filter, or
                   refresh the stock master.
@@ -627,7 +649,7 @@ function Stocks() {
             ) : (
               stocks.length > 0 && (
                 <div className="table-scroll">
-                  <table className="pro-table">
+                  <table className="pro-table stocks-mobile-table">
                     <thead>
                       <tr>
                         <th>Symbol</th>
@@ -642,19 +664,26 @@ function Stocks() {
                       {stocks.map((stock) => (
                         <tr
                           key={`${stock.exchange}-${stock.token}-${stock.symbol}`}
+                          className="stock-mobile-row"
                           style={{ cursor: "pointer" }}
                           onClick={() => viewStock(stock)}
                         >
-                          <td>
-                            <strong style={{ color: "#0f172a" }}>
+                          <td data-label="Symbol">
+                            <strong
+                              style={{ color: "#0f172a", fontSize: "15px" }}
+                            >
                               {stock.symbol}
                             </strong>
                           </td>
 
-                          <td>
+                          <td data-label="Company">
                             <div>
-                              <strong>{stock.name || "Stock Instrument"}</strong>
+                              <strong>
+                                {stock.name || "Stock Instrument"}
+                              </strong>
+
                               <p
+                                className="mobile-stock-subtext"
                                 style={{
                                   margin: "4px 0 0",
                                   color: "#64748b",
@@ -662,13 +691,12 @@ function Stocks() {
                                   fontWeight: "700",
                                 }}
                               >
-                                Click row to open details, stats, chart, and order
-                                panel.
+                                Tap to open chart, stats, and order panel.
                               </p>
                             </div>
                           </td>
 
-                          <td>
+                          <td data-label="Exchange">
                             <span
                               className={
                                 stock.exchange === "NSE"
@@ -680,7 +708,7 @@ function Stocks() {
                             </span>
                           </td>
 
-                          <td>
+                          <td data-label="Token">
                             <span
                               style={{
                                 fontWeight: "800",
@@ -691,14 +719,8 @@ function Stocks() {
                             </span>
                           </td>
 
-                          <td>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "10px",
-                                flexWrap: "wrap",
-                              }}
-                            >
+                          <td data-label="Action">
+                            <div className="mobile-stock-actions">
                               <button
                                 className="watch-btn"
                                 onClick={(e) => addToWatchlist(e, stock)}
