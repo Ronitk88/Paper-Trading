@@ -1,213 +1,159 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   FaChartLine,
-  FaChevronLeft,
-  FaChevronRight,
-  FaDatabase,
-  FaFilter,
+  FaEye,
+  FaRedo,
   FaSearch,
-  FaSyncAlt,
+  FaStar,
+  FaTrash,
 } from "react-icons/fa";
 
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
-import api from "../api/api";
 import SkeletonLoader from "../components/SkeletonLoader";
+import { useConfirm } from "../components/ConfirmProvider";
+import api from "../api/api";
 
-function Stocks() {
+function Watchlist() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { showConfirm } = useConfirm();
 
   const [stocks, setStocks] = useState([]);
-  const [search, setSearch] = useState("");
-  const [exchange, setExchange] = useState("ALL");
-
   const [loading, setLoading] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-
-  const [page, setPage] = useState(1);
-  const [limit] = useState(20);
-
-  const [pagination, setPagination] = useState({
-    total: 0,
-    total_pages: 1,
-  });
-
-  const [stats, setStats] = useState({
-    total: 0,
-    nse_count: 0,
-    bse_count: 0,
-  });
+  const [removingSymbol, setRemovingSymbol] = useState(null);
+  const [search, setSearch] = useState("");
+  const [livePrices, setLivePrices] = useState({});
+  const [pricesLoading, setPricesLoading] = useState(false);
 
   useEffect(() => {
-    const urlSearch = searchParams.get("search") || "";
-
-    if (urlSearch.trim()) {
-      setSearch(urlSearch);
-      setPage(1);
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    loadStats();
+    loadWatchlist();
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadStocks(page, search);
-    }, 300);
+    if (stocks.length === 0) return;
+    loadLivePrices();
+    const interval = setInterval(loadLivePrices, 10000);
+    return () => clearInterval(interval);
+  }, [stocks.length]);
 
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, exchange, search]);
-
-  const loadStats = async () => {
+  const loadLivePrices = async () => {
     try {
-      const res = await api.get("/stocks/stats");
-      setStats(res.data || {});
+      setPricesLoading(true);
+      const instruments = stocks
+        .filter((s) => s.exchange && s.token)
+        .map((s) => ({
+          exchange: s.exchange,
+          symboltoken: s.token,
+          tradingsymbol: s.symbol,
+        }));
+      if (instruments.length === 0) return;
+      const res = await api.post("/market/quote-batch", { instruments });
+      const quotes = res.data?.quotes || [];
+      const priceMap = {};
+      quotes.forEach((q) => {
+        const key = `${q.exchange}:${q.symboltoken}`;
+        priceMap[key] = q;
+      });
+      setLivePrices(priceMap);
     } catch (err) {
-      console.error("Failed to load stock stats:", err);
+      console.error("Live prices load failed:", err);
+    } finally {
+      setPricesLoading(false);
     }
   };
 
-  const loadStocks = async (pageNumber = page, searchValue = search) => {
+  const getLivePrice = (item) => {
+    const key = `${item.exchange}:${item.token}`;
+    return livePrices[key];
+  };
+
+  const formatMoney = (value) => {
+    if (value === null || value === undefined) return "-";
+    return Number(value).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
+  const loadWatchlist = async () => {
     try {
       setLoading(true);
 
-      const res = await api.get("/stocks/paginated", {
-        params: {
-          page: pageNumber,
-          limit,
-          exchange,
-          q: searchValue,
-        },
-      });
+      const res = await api.get("/watchlist/");
 
-      setStocks(res.data.items || []);
-      setPagination({
-        total: res.data.total || 0,
-        total_pages: res.data.total_pages || 1,
-      });
+      setStocks(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error("Failed to load stocks:", err);
-      alert("Unable to load stocks.");
+      console.error("Failed to load watchlist:", err);
+      window.showToast?.("Unable to load watchlist.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const removeFromWatchlist = async (symbol) => {
+    const confirmed = await showConfirm(
+      `Remove ${symbol} from watchlist?`,
+      { title: "Remove from Watchlist", confirmLabel: "Remove", isDangerous: true }
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setRemovingSymbol(symbol);
+
+      await api.delete(`/watchlist/${encodeURIComponent(symbol)}`);
+
+      window.showToast?.(`${symbol} removed from watchlist`);
+
+      await loadWatchlist();
+    } catch (err) {
+      console.error("Remove failed:", err);
+      window.showToast?.(err?.response?.data?.detail || "Remove failed");
+    } finally {
+      setRemovingSymbol(null);
+    }
+  };
+
+  const openStock = (symbol) => {
+    if (!symbol) return;
+    navigate(`/stocks/${encodeURIComponent(symbol)}`);
+  };
+
+  const openStocksPage = () => {
+    navigate("/stocks");
   };
 
   const formatNumber = (value) => {
     return Number(value || 0).toLocaleString("en-IN");
   };
 
-  const handleSearch = (value) => {
-    setSearch(value);
-    setPage(1);
-  };
+  const filteredStocks = useMemo(() => {
+    const cleanSearch = search.trim().toUpperCase();
 
-  const handleExchangeChange = (value) => {
-    setExchange(value);
-    setPage(1);
-  };
+    if (!cleanSearch) return stocks;
 
-  const clearFilters = () => {
-    setSearch("");
-    setExchange("ALL");
-    setPage(1);
-  };
+    return stocks.filter((item) => {
+      const combinedText = `${item.symbol || ""} ${item.name || ""} ${
+        item.exchange || ""
+      } ${item.token || ""}`.toUpperCase();
 
-  const syncStocks = async () => {
-    try {
-      setSyncing(true);
+      return combinedText.includes(cleanSearch);
+    });
+  }, [stocks, search]);
 
-      const res = await api.post("/stocks/sync");
+  const nseCount = stocks.filter(
+    (item) => String(item.exchange || "").toUpperCase() === "NSE"
+  ).length;
 
-      alert(
-        `${res.data.message}\nTotal: ${res.data.total_stocks}\nNSE: ${res.data.nse_count}\nBSE: ${res.data.bse_count}`
-      );
+  const bseCount = stocks.filter(
+    (item) => String(item.exchange || "").toUpperCase() === "BSE"
+  ).length;
 
-      setPage(1);
-      await loadStats();
-      await loadStocks(1, search);
-    } catch (err) {
-      console.error("Stock sync failed:", err);
-      alert(err?.response?.data?.detail || "Stock sync failed.");
-    } finally {
-      setSyncing(false);
-    }
-  };
-
-  const addToWatchlist = async (e, stock) => {
-    e.stopPropagation();
-
-    try {
-      await api.post("/watchlist/", {
-        symbol: stock.symbol,
-      });
-
-      alert(`${stock.symbol} added to watchlist!`);
-    } catch (err) {
-      console.error("Watchlist add failed:", err);
-      alert(err?.response?.data?.detail || "Failed to add to watchlist");
-    }
-  };
-
-  const viewStock = (stock) => {
-    navigate(`/stocks/${encodeURIComponent(stock.symbol)}`);
-  };
-
-  const goPrev = () => {
-    if (page > 1 && !loading) {
-      setPage((prev) => prev - 1);
-    }
-  };
-
-  const goNext = () => {
-    if (page < pagination.total_pages && !loading) {
-      setPage((prev) => prev + 1);
-    }
-  };
-
-  const popularSearches = [
-    "RELIANCE",
-    "TCS",
-    "INFY",
-    "HDFCBANK",
-    "SBIN",
-    "ICICIBANK",
-  ];
-
-  const visibleRange = useMemo(() => {
-    const start = pagination.total === 0 ? 0 : (page - 1) * limit + 1;
-    const end = Math.min(page * limit, pagination.total || 0);
-
-    return {
-      start,
-      end,
-    };
-  }, [page, limit, pagination.total]);
-
-  const exchangeCards = [
-    {
-      label: "All Stocks",
-      value: "ALL",
-      count: stats.total || 0,
-      desc: "Complete NSE + BSE stock master",
-    },
-    {
-      label: "NSE Stocks",
-      value: "NSE",
-      count: stats.nse_count || 0,
-      desc: "National Stock Exchange instruments",
-    },
-    {
-      label: "BSE Stocks",
-      value: "BSE",
-      count: stats.bse_count || 0,
-      desc: "Bombay Stock Exchange instruments",
-    },
-  ];
+  const unknownExchangeCount = Math.max(
+    0,
+    stocks.length - nseCount - bseCount
+  );
 
   return (
     <div className="dashboard-layout">
@@ -219,16 +165,16 @@ function Stocks() {
         <div className="dashboard-content professional-dashboard">
           <div className="pro-dashboard-hero">
             <div>
-              <p className="pro-eyebrow">Market Discovery</p>
+              <p className="pro-eyebrow">Market Watch Center</p>
 
               <h1>
-                Stocks <span>Market</span>
+                My <span>Watchlist</span>
               </h1>
 
               <p>
-                Search NSE/BSE stocks, open live-style charts, analyze market
-                stats, add instruments to your watchlist, and place paper
-                trades.
+                Track your favorite stocks, quickly open stock details, trade
+                paper positions, and keep your most important instruments ready
+                for action.
               </p>
 
               <div
@@ -240,107 +186,93 @@ function Stocks() {
                 }}
               >
                 <span className="status-pill status-success">
-                  {formatNumber(stats.total)} Instruments
+                  {formatNumber(stocks.length)} Tracked
                 </span>
 
                 <span className="status-pill status-warning">
-                  Angel One Tokens
+                  {formatNumber(nseCount)} NSE
                 </span>
 
                 <span className="status-pill status-success">
-                  NSE + BSE Active
+                  {formatNumber(bseCount)} BSE
                 </span>
               </div>
             </div>
 
             <div className="pro-hero-actions">
               <div className="pro-status-card">
-                <span className="status-pill status-success">Stock Master</span>
-                <p>Database-backed instrument search</p>
+                <span className="status-pill status-success">
+                  Active Watchlist
+                </span>
+                <p>Saved to your account</p>
               </div>
 
               <button
                 className="primary-action"
-                onClick={syncStocks}
-                disabled={syncing}
+                onClick={loadWatchlist}
+                disabled={loading}
               >
-                <FaSyncAlt style={{ marginRight: "8px" }} />
-                {syncing ? "Refreshing..." : "Refresh Stock Master"}
+                <FaRedo style={{ marginRight: "8px" }} />
+                {loading ? "Refreshing..." : "Refresh"}
+              </button>
+
+              <button className="primary-action" onClick={openStocksPage}>
+                <FaSearch style={{ marginRight: "8px" }} />
+                Find Stocks
               </button>
             </div>
           </div>
 
-          <div className="dashboard-cards">
-            {exchangeCards.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                className="stat-card"
-                onClick={() => handleExchangeChange(item.value)}
-                style={{
-                  textAlign: "left",
-                  cursor: "pointer",
-                  border:
-                    exchange === item.value
-                      ? "2px solid #2563eb"
-                      : "1px solid #e5e7eb",
-                }}
-              >
-                <h4>{item.label}</h4>
+          <div className="pro-kpi-grid">
+            <div className="pro-kpi-card">
+              <p>Total Watchlist</p>
+              <h2>{formatNumber(stocks.length)}</h2>
+              <span className="pro-muted">Saved instruments</span>
+            </div>
 
-                <h2>{formatNumber(item.count)}</h2>
+            <div className="pro-kpi-card">
+              <p>NSE Instruments</p>
+              <h2>{formatNumber(nseCount)}</h2>
+              <span className="pro-muted">National Stock Exchange</span>
+            </div>
 
-                <p
+            <div className="pro-kpi-card">
+              <p>BSE Instruments</p>
+              <h2>{formatNumber(bseCount)}</h2>
+              <span className="pro-muted">Bombay Stock Exchange</span>
+            </div>
+
+            <div className="pro-kpi-card">
+              <p>Other / Unmapped</p>
+              <h2>{formatNumber(unknownExchangeCount)}</h2>
+              <span className="pro-muted">Symbols without exchange metadata</span>
+            </div>
+          </div>
+
+          <div className="pro-dashboard-grid" style={{ marginTop: "24px" }}>
+            <div className="pro-panel">
+              <div className="pro-panel-header">
+                <div>
+                  <h2>
+                    <FaStar style={{ marginRight: "10px", color: "#2563eb" }} />
+                    Watchlist Search
+                  </h2>
+                  <p>Search your saved symbols, names, exchanges, or tokens.</p>
+                </div>
+
+                <button
+                  className="warning-action"
+                  onClick={() => setSearch("")}
+                  disabled={!search}
                   style={{
-                    margin: "10px 0 0",
-                    color: "#64748b",
-                    fontWeight: "700",
-                    lineHeight: "1.5",
+                    opacity: search ? 1 : 0.55,
+                    cursor: search ? "pointer" : "not-allowed",
                   }}
                 >
-                  {item.desc}
-                </p>
-              </button>
-            ))}
-
-            <div className="stat-card">
-              <h4>Selected Exchange</h4>
-              <h2>{exchange}</h2>
-              <p
-                style={{
-                  margin: "10px 0 0",
-                  color: "#64748b",
-                  fontWeight: "700",
-                  lineHeight: "1.5",
-                }}
-              >
-                Current active market filter
-              </p>
-            </div>
-          </div>
-
-          <div className="pro-panel" style={{ marginTop: "24px" }}>
-            <div className="pro-panel-header">
-              <div>
-                <h2>Advanced Stock Search</h2>
-                <p>
-                  Filter by symbol, company name, exchange, or Angel One token.
-                </p>
+                  Clear Search
+                </button>
               </div>
 
-              <button className="warning-action" onClick={clearFilters}>
-                Clear Filters
-              </button>
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) 190px",
-                gap: "14px",
-                marginBottom: "18px",
-              }}
-            >
               <div style={{ position: "relative" }}>
                 <FaSearch
                   style={{
@@ -355,9 +287,9 @@ function Stocks() {
 
                 <input
                   type="text"
-                  placeholder="Search by symbol, company name, or token..."
+                  placeholder="Search watchlist, e.g. RELIANCE, TCS, INFY..."
                   value={search}
-                  onChange={(e) => handleSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target.value)}
                   style={{
                     width: "100%",
                     padding: "14px 14px 14px 42px",
@@ -369,226 +301,187 @@ function Stocks() {
                   }}
                 />
               </div>
-
-              <select
-                value={exchange}
-                onChange={(e) => handleExchangeChange(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "14px",
-                  borderRadius: "14px",
-                  border: "1px solid #d1d5db",
-                  outline: "none",
-                  fontSize: "15px",
-                  background: "white",
-                  fontWeight: "800",
-                }}
-              >
-                <option value="ALL">All Exchanges</option>
-                <option value="NSE">NSE</option>
-                <option value="BSE">BSE</option>
-              </select>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                flexWrap: "wrap",
-                marginBottom: "6px",
-              }}
-            >
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  color: "#64748b",
-                  fontWeight: "900",
-                  fontSize: "13px",
-                }}
-              >
-                <FaFilter />
-                Popular:
-              </span>
+            <div className="pro-panel">
+              <div className="pro-panel-header">
+                <div>
+                  <h2>Quick Actions</h2>
+                  <p>Use watchlist as your daily trading shortlist.</p>
+                </div>
+              </div>
 
-              {popularSearches.map((item) => (
+              <div className="market-card-list">
                 <button
-                  key={item}
                   type="button"
-                  className="status-pill status-success"
-                  onClick={() => handleSearch(item)}
-                  style={{
-                    border: "none",
-                    cursor: "pointer",
-                  }}
+                  className="market-card-item market-clickable"
+                  onClick={openStocksPage}
                 >
-                  {item}
+                  <span>Add More Stocks</span>
+                  <strong>Open Market</strong>
                 </button>
-              ))}
+
+                <button
+                  type="button"
+                  className="market-card-item market-clickable"
+                  onClick={() => navigate("/portfolio")}
+                >
+                  <span>Portfolio</span>
+                  <strong>View Holdings</strong>
+                </button>
+
+                <button
+                  type="button"
+                  className="market-card-item market-clickable"
+                  onClick={() => navigate("/orders")}
+                >
+                  <span>Orders</span>
+                  <strong>Review Execution</strong>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="table-card" style={{ marginTop: "24px" }}>
+          <div className="table-card" style={{ marginTop: "30px" }}>
             <div
+              className="pro-panel-header"
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "20px",
-                alignItems: "center",
-                flexWrap: "wrap",
-                marginBottom: "18px",
+                marginBottom: "20px",
               }}
             >
               <div>
-                <h2>
-                  <FaDatabase style={{ marginRight: "10px", color: "#2563eb" }} />
-                  Stock Master
-                </h2>
-
-                <p style={{ color: "#64748b", margin: 0 }}>
-                  Showing {visibleRange.start}–{visibleRange.end} of{" "}
-                  {formatNumber(pagination.total)} records · Page {page} of{" "}
-                  {pagination.total_pages}
+                <h2>My Watchlist</h2>
+                <p>
+                  Showing {formatNumber(filteredStocks.length)} of{" "}
+                  {formatNumber(stocks.length)} saved stocks.
                 </p>
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                <button
-                  className="primary-action"
-                  onClick={goPrev}
-                  disabled={page <= 1 || loading}
-                  style={{
-                    opacity: page <= 1 || loading ? 0.5 : 1,
-                    cursor: page <= 1 || loading ? "not-allowed" : "pointer",
-                  }}
-                >
-                  <FaChevronLeft style={{ marginRight: "7px" }} />
-                  Previous
-                </button>
-
-                <span
-                  style={{
-                    fontWeight: "900",
-                    color: "#334155",
-                    background: "#f8fafc",
-                    border: "1px solid #e5e7eb",
-                    padding: "10px 14px",
-                    borderRadius: "12px",
-                  }}
-                >
-                  {page} / {pagination.total_pages}
-                </span>
-
-                <button
-                  className="primary-action"
-                  onClick={goNext}
-                  disabled={page >= pagination.total_pages || loading}
-                  style={{
-                    opacity:
-                      page >= pagination.total_pages || loading ? 0.5 : 1,
-                    cursor:
-                      page >= pagination.total_pages || loading
-                        ? "not-allowed"
-                        : "pointer",
-                  }}
-                >
-                  Next
-                  <FaChevronRight style={{ marginLeft: "7px" }} />
-                </button>
-              </div>
+              <button className="primary-action" onClick={openStocksPage}>
+                Add Stock
+              </button>
             </div>
 
-            {loading && <SkeletonLoader rows={6} />}
-
-            {!loading && stocks.length === 0 ? (
+            {loading ? (
+              <SkeletonLoader rows={6} />
+            ) : filteredStocks.length === 0 ? (
               <div className="empty-state">
-                <h3>No stocks found</h3>
+                <h3>
+                  {stocks.length === 0
+                    ? "No stocks in watchlist"
+                    : "No matching stocks found"}
+                </h3>
+
                 <p>
-                  Try another symbol/company name, change exchange filter, or
-                  refresh the stock master.
+                  {stocks.length === 0
+                    ? "Add stocks from the Stocks page to track them here."
+                    : "Try a different symbol, name, exchange, or token."}
                 </p>
 
                 <button
                   className="primary-action"
-                  onClick={syncStocks}
-                  disabled={syncing}
+                  onClick={openStocksPage}
                   style={{ marginTop: "18px" }}
                 >
-                  {syncing ? "Refreshing..." : "Refresh Stock Master"}
+                  Explore Stocks
                 </button>
               </div>
             ) : (
-              !loading && (
-                <div className="table-scroll">
-                <table className="pro-table">
-                  <thead>
-                    <tr>
-                      <th>Symbol</th>
-                      <th>Name</th>
-                      <th>Exchange</th>
-                      <th>Token</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
+              <div className="table-scroll">
+              <table className="pro-table">
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Name</th>
+                    <th>Exchange</th>
+                    <th>LTP</th>
+                    <th>Change</th>
+                    <th>Day High / Low</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
 
-                  <tbody>
-                    {stocks.map((stock) => (
+                <tbody>
+                  {filteredStocks.map((item) => {
+                    const symbol = item.symbol || "-";
+                    const rowKey = item.id || `${item.exchange}-${item.token}-${symbol}`;
+                    const isRemoving = removingSymbol === symbol;
+                    const live = getLivePrice(item);
+
+                    return (
                       <tr
-                        key={`${stock.exchange}-${stock.token}-${stock.symbol}`}
+                        key={rowKey}
                         style={{ cursor: "pointer" }}
-                        onClick={() => viewStock(stock)}
+                        onClick={() => openStock(symbol)}
                       >
                         <td>
-                          <strong style={{ color: "#0f172a" }}>
-                            {stock.symbol}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openStock(symbol);
+                            }}
+                            style={{
+                              border: "none",
+                              background: "transparent",
+                              padding: 0,
+                              color: "#2563eb",
+                              fontWeight: "900",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {symbol}
+                          </button>
+                        </td>
+
+                        <td>
+                          <strong>{item.name || "Watchlist Instrument"}</strong>
+                          <p
+                            style={{
+                              margin: "4px 0 0",
+                              color: "#64748b",
+                              fontSize: "13px",
+                              fontWeight: "700",
+                            }}
+                          >
+                            Click row to open chart, stats, and order panel.
+                          </p>
+                        </td>
+
+                        <td>
+                          {item.exchange ? (
+                            <span
+                              className={
+                                String(item.exchange).toUpperCase() === "NSE"
+                                  ? "status-pill status-success"
+                                  : "status-pill status-warning"
+                              }
+                            >
+                              {item.exchange}
+                            </span>
+                          ) : (
+                            <span className="status-pill">-</span>
+                          )}
+                        </td>
+
+                        <td>
+                          <strong style={{ fontSize: "16px" }}>
+                            {live?.ltp != null ? `₹${formatMoney(live.ltp)}` : pricesLoading ? "..." : "-"}
                           </strong>
                         </td>
 
                         <td>
-                          <div>
-                            <strong>{stock.name || "Stock Instrument"}</strong>
-                            <p
-                              style={{
-                                margin: "4px 0 0",
-                                color: "#64748b",
-                                fontSize: "13px",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Click row to open details, stats, chart, and order
-                              panel.
-                            </p>
-                          </div>
+                          {live?.change != null ? (
+                            <span style={{ color: Number(live.change) >= 0 ? "#16a34a" : "#dc2626", fontWeight: "800" }}>
+                              {Number(live.change) >= 0 ? "+" : ""}₹{formatMoney(live.change)}
+                              {live.change_percent != null && ` (${Number(live.change_percent).toFixed(2)}%)`}
+                            </span>
+                          ) : pricesLoading ? "..." : "-"}
                         </td>
 
                         <td>
-                          <span
-                            className={
-                              stock.exchange === "NSE"
-                                ? "status-pill status-success"
-                                : "status-pill status-warning"
-                            }
-                          >
-                            {stock.exchange}
-                          </span>
-                        </td>
-
-                        <td>
-                          <span
-                            style={{
-                              fontWeight: "800",
-                              color: "#475569",
-                            }}
-                          >
-                            {stock.token}
+                          <span style={{ color: "#475569", fontWeight: "700", fontSize: "13px" }}>
+                            {live?.high != null ? `₹${formatMoney(live.high)}` : "-"} / {live?.low != null ? `₹${formatMoney(live.low)}` : "-"}
                           </span>
                         </td>
 
@@ -601,35 +494,56 @@ function Stocks() {
                             }}
                           >
                             <button
-                              className="watch-btn"
-                              onClick={(e) => addToWatchlist(e, stock)}
+                              className="primary-action"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openStock(symbol);
+                              }}
                             >
-                              + Watchlist
+                              <FaEye style={{ marginRight: "7px" }} />
+                              View
                             </button>
 
                             <button
                               className="buy-btn"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                viewStock(stock);
+                                openStock(symbol);
                               }}
                             >
                               <FaChartLine style={{ marginRight: "7px" }} />
                               Trade
                             </button>
+
+                            <button
+                              className="danger-action"
+                              disabled={isRemoving}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeFromWatchlist(symbol);
+                              }}
+                              style={{
+                                opacity: isRemoving ? 0.6 : 1,
+                                cursor: isRemoving ? "not-allowed" : "pointer",
+                              }}
+                            >
+                              <FaTrash style={{ marginRight: "7px" }} />
+                              {isRemoving ? "Removing..." : "Remove"}
+                            </button>
                           </div>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-                </div>
-              )
+                    );
+                  })}
+                </tbody>
+              </table>
+              </div>
             )}
 
             <div className="footer-note">
-              Total records: {formatNumber(pagination.total)}. Search examples:
-              RELIANCE, TCS, INFY, HDFCBANK, SBIN, ICICIBANK, or BSE scripts.
+              Watchlist helps you keep your most important instruments ready for
+              analysis and paper trading. Use the Stocks page to add more NSE/BSE
+              symbols.
             </div>
           </div>
         </div>
@@ -638,4 +552,4 @@ function Stocks() {
   );
 }
 
-export default Stocks;
+export default Watchlist;
