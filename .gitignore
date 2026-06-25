@@ -30,11 +30,13 @@ npm-debug.log*
 *.sqlite3
 paper_trading.db
 
-# ─── IDE / OS ───
+# ─── Agent / IDE / OS ───
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+.agents/
+.commandcode/
 
 # ─── Testing / Coverage ───
 .pytest_cache/
