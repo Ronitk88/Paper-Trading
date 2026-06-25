@@ -37,25 +37,30 @@ function Login() {
   };
 
   const saveLoginSession = (response) => {
-    const displayName = formatName(
-      response.data.user?.username ||
-        response.data.user?.email?.split("@")[0] ||
-        "Trader"
-    );
+  const token = response.data.access_token || response.data.token;
 
-    sessionStorage.setItem("token", response.data.access_token);
-    sessionStorage.setItem("username", displayName);
-    sessionStorage.setItem("email", response.data.user?.email || "");
-    sessionStorage.setItem("phone", response.data.user?.phone || "");
+  if (!token) {
+    console.log("Login response:", response.data);
+    alert("Login successful but token was not received from backend.");
+    return false;
+  }
 
-    localStorage.removeItem("token");
-    localStorage.setItem("username", displayName);
-    localStorage.setItem("email", response.data.user?.email || "");
-    localStorage.setItem("phone", response.data.user?.phone || "");
+  const user = response.data.user || {};
 
-    window.location.href = "/dashboard";
-  };
+  const displayName =
+    user.username ||
+    user.name ||
+    response.data.username ||
+    email?.split("@")[0] ||
+    "User";
 
+  sessionStorage.setItem("token", response.data.access_token);
+  localStorage.setItem("username", displayName);
+  localStorage.setItem("email", user.email || response.data.email || email || "");
+  localStorage.setItem("phone", user.phone || response.data.phone || phone || "");
+
+  return true;
+};
   const resetOtpState = () => {
     setOtpCode("");
     setOtpSent(false);
@@ -247,7 +252,9 @@ function Login() {
       password,
     });
 
-    saveLoginSession(response);
+    const saved = saveLoginSession(response);
+
+if (!saved) return;
   };
 
   const handleForgotPassword = async () => {
