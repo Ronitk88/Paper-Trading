@@ -19,3 +19,4 @@ reportlab
 cryptography
 google-auth
 psycopg2-binary
+logzerologzero
