@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   FaChartLine,
@@ -40,6 +40,135 @@ function Stocks() {
     bse_count: 0,
   });
 
+  const STOCKS_CACHE_TTL = 60 * 1000;
+
+  const formatNumber = (value) => {
+    return Number(value || 0).toLocaleString("en-IN");
+  };
+
+  const getStocksCacheKey = (pageNumber, searchValue, exchangeValue) => {
+    return `stocks_cache_v1_${pageNumber}_${exchangeValue}_${searchValue || ""}`;
+  };
+
+  const saveStocksCache = (key, data) => {
+    try {
+      sessionStorage.setItem(
+        key,
+        JSON.stringify({
+          timestamp: Date.now(),
+          data,
+        })
+      );
+    } catch {
+      // Ignore cache errors
+    }
+  };
+
+  const readStocksCache = (key) => {
+    try {
+      const raw = sessionStorage.getItem(key);
+      if (!raw) return null;
+
+      const parsed = JSON.parse(raw);
+
+      if (!parsed?.timestamp || !parsed?.data) {
+        sessionStorage.removeItem(key);
+        return null;
+      }
+
+      const isFresh = Date.now() - parsed.timestamp < STOCKS_CACHE_TTL;
+
+      return {
+        data: parsed.data,
+        isFresh,
+      };
+    } catch {
+      sessionStorage.removeItem(key);
+      return null;
+    }
+  };
+
+  const loadStats = useCallback(async () => {
+    try {
+      const cachedStats = sessionStorage.getItem("stocks_stats_cache_v1");
+
+      if (cachedStats) {
+        const parsed = JSON.parse(cachedStats);
+        const isFresh = Date.now() - parsed.timestamp < STOCKS_CACHE_TTL;
+
+        if (isFresh) {
+          setStats(parsed.data || {});
+          return;
+        }
+      }
+
+      const res = await api.get("/stocks/stats");
+
+      setStats(res.data || {});
+
+      sessionStorage.setItem(
+        "stocks_stats_cache_v1",
+        JSON.stringify({
+          timestamp: Date.now(),
+          data: res.data || {},
+        })
+      );
+    } catch (err) {
+      console.error("Failed to load stock stats:", err);
+    }
+  }, []);
+
+  const loadStocks = useCallback(
+    async (pageNumber = page, searchValue = search, exchangeValue = exchange) => {
+      const cacheKey = getStocksCacheKey(pageNumber, searchValue, exchangeValue);
+
+      try {
+        const cached = readStocksCache(cacheKey);
+
+        if (cached?.data) {
+          setStocks(cached.data.items || []);
+
+          setPagination({
+            total: cached.data.total || 0,
+            total_pages: cached.data.total_pages || 1,
+          });
+
+          if (cached.isFresh) {
+            return;
+          }
+        }
+
+        setLoading(true);
+
+        const res = await api.get("/stocks/paginated", {
+          params: {
+            page: pageNumber,
+            limit,
+            exchange: exchangeValue,
+            q: searchValue,
+          },
+        });
+
+        const data = res.data || {};
+
+        setStocks(data.items || []);
+
+        setPagination({
+          total: data.total || 0,
+          total_pages: data.total_pages || 1,
+        });
+
+        saveStocksCache(cacheKey, data);
+      } catch (err) {
+        console.error("Failed to load stocks:", err);
+        window.showToast?.("Unable to load stocks.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page, search, exchange, limit]
+  );
+
   useEffect(() => {
     const urlSearch = searchParams.get("search") || "";
 
@@ -51,55 +180,15 @@ function Stocks() {
 
   useEffect(() => {
     loadStats();
-  }, []);
+  }, [loadStats]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      loadStocks(page, search);
+      loadStocks(page, search, exchange);
     }, 300);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, exchange, search]);
-
-  const loadStats = async () => {
-    try {
-      const res = await api.get("/stocks/stats");
-      setStats(res.data || {});
-    } catch (err) {
-      console.error("Failed to load stock stats:", err);
-    }
-  };
-
-  const loadStocks = async (pageNumber = page, searchValue = search) => {
-    try {
-      setLoading(true);
-
-      const res = await api.get("/stocks/paginated", {
-        params: {
-          page: pageNumber,
-          limit,
-          exchange,
-          q: searchValue,
-        },
-      });
-
-      setStocks(res.data.items || []);
-      setPagination({
-        total: res.data.total || 0,
-        total_pages: res.data.total_pages || 1,
-      });
-    } catch (err) {
-      console.error("Failed to load stocks:", err);
-      alert("Unable to load stocks.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatNumber = (value) => {
-    return Number(value || 0).toLocaleString("en-IN");
-  };
+  }, [page, exchange, search, loadStocks]);
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -123,16 +212,26 @@ function Stocks() {
 
       const res = await api.post("/stocks/sync");
 
-      alert(
-        `${res.data.message}\nTotal: ${res.data.total_stocks}\nNSE: ${res.data.nse_count}\nBSE: ${res.data.bse_count}`
+      sessionStorage.removeItem("stocks_stats_cache_v1");
+
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith("stocks_cache_v1_")) {
+          sessionStorage.removeItem(key);
+        }
+      });
+
+      window.showToast?.(
+        `${res.data.message || "Stock master refreshed"} · Total: ${
+          res.data.total_stocks || 0
+        }`
       );
 
       setPage(1);
       await loadStats();
-      await loadStocks(1, search);
+      await loadStocks(1, search, exchange);
     } catch (err) {
       console.error("Stock sync failed:", err);
-      alert(err?.response?.data?.detail || "Stock sync failed.");
+      window.showToast?.(err?.response?.data?.detail || "Stock sync failed.");
     } finally {
       setSyncing(false);
     }
@@ -146,14 +245,15 @@ function Stocks() {
         symbol: stock.symbol,
       });
 
-      alert(`${stock.symbol} added to watchlist!`);
+      window.showToast?.(`${stock.symbol} added to watchlist!`);
     } catch (err) {
       console.error("Watchlist add failed:", err);
-      alert(err?.response?.data?.detail || "Failed to add to watchlist");
+      window.showToast?.(err?.response?.data?.detail || "Failed to add to watchlist");
     }
   };
 
   const viewStock = (stock) => {
+    if (!stock?.symbol) return;
     navigate(`/stocks/${encodeURIComponent(stock.symbol)}`);
   };
 
@@ -492,8 +592,7 @@ function Stocks() {
                   onClick={goNext}
                   disabled={page >= pagination.total_pages || loading}
                   style={{
-                    opacity:
-                      page >= pagination.total_pages || loading ? 0.5 : 1,
+                    opacity: page >= pagination.total_pages || loading ? 0.5 : 1,
                     cursor:
                       page >= pagination.total_pages || loading
                         ? "not-allowed"
@@ -506,7 +605,7 @@ function Stocks() {
               </div>
             </div>
 
-            {loading && <SkeletonLoader rows={6} />}
+            {loading && stocks.length === 0 && <SkeletonLoader rows={6} />}
 
             {!loading && stocks.length === 0 ? (
               <div className="empty-state">
@@ -526,103 +625,103 @@ function Stocks() {
                 </button>
               </div>
             ) : (
-              !loading && (
+              stocks.length > 0 && (
                 <div className="table-scroll">
-                <table className="pro-table">
-                  <thead>
-                    <tr>
-                      <th>Symbol</th>
-                      <th>Name</th>
-                      <th>Exchange</th>
-                      <th>Token</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {stocks.map((stock) => (
-                      <tr
-                        key={`${stock.exchange}-${stock.token}-${stock.symbol}`}
-                        style={{ cursor: "pointer" }}
-                        onClick={() => viewStock(stock)}
-                      >
-                        <td>
-                          <strong style={{ color: "#0f172a" }}>
-                            {stock.symbol}
-                          </strong>
-                        </td>
-
-                        <td>
-                          <div>
-                            <strong>{stock.name || "Stock Instrument"}</strong>
-                            <p
-                              style={{
-                                margin: "4px 0 0",
-                                color: "#64748b",
-                                fontSize: "13px",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Click row to open details, stats, chart, and order
-                              panel.
-                            </p>
-                          </div>
-                        </td>
-
-                        <td>
-                          <span
-                            className={
-                              stock.exchange === "NSE"
-                                ? "status-pill status-success"
-                                : "status-pill status-warning"
-                            }
-                          >
-                            {stock.exchange}
-                          </span>
-                        </td>
-
-                        <td>
-                          <span
-                            style={{
-                              fontWeight: "800",
-                              color: "#475569",
-                            }}
-                          >
-                            {stock.token}
-                          </span>
-                        </td>
-
-                        <td>
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            <button
-                              className="watch-btn"
-                              onClick={(e) => addToWatchlist(e, stock)}
-                            >
-                              + Watchlist
-                            </button>
-
-                            <button
-                              className="buy-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                viewStock(stock);
-                              }}
-                            >
-                              <FaChartLine style={{ marginRight: "7px" }} />
-                              Trade
-                            </button>
-                          </div>
-                        </td>
+                  <table className="pro-table">
+                    <thead>
+                      <tr>
+                        <th>Symbol</th>
+                        <th>Name</th>
+                        <th>Exchange</th>
+                        <th>Token</th>
+                        <th>Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+
+                    <tbody>
+                      {stocks.map((stock) => (
+                        <tr
+                          key={`${stock.exchange}-${stock.token}-${stock.symbol}`}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => viewStock(stock)}
+                        >
+                          <td>
+                            <strong style={{ color: "#0f172a" }}>
+                              {stock.symbol}
+                            </strong>
+                          </td>
+
+                          <td>
+                            <div>
+                              <strong>{stock.name || "Stock Instrument"}</strong>
+                              <p
+                                style={{
+                                  margin: "4px 0 0",
+                                  color: "#64748b",
+                                  fontSize: "13px",
+                                  fontWeight: "700",
+                                }}
+                              >
+                                Click row to open details, stats, chart, and order
+                                panel.
+                              </p>
+                            </div>
+                          </td>
+
+                          <td>
+                            <span
+                              className={
+                                stock.exchange === "NSE"
+                                  ? "status-pill status-success"
+                                  : "status-pill status-warning"
+                              }
+                            >
+                              {stock.exchange}
+                            </span>
+                          </td>
+
+                          <td>
+                            <span
+                              style={{
+                                fontWeight: "800",
+                                color: "#475569",
+                              }}
+                            >
+                              {stock.token}
+                            </span>
+                          </td>
+
+                          <td>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "10px",
+                                flexWrap: "wrap",
+                              }}
+                            >
+                              <button
+                                className="watch-btn"
+                                onClick={(e) => addToWatchlist(e, stock)}
+                              >
+                                + Watchlist
+                              </button>
+
+                              <button
+                                className="buy-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  viewStock(stock);
+                                }}
+                              >
+                                <FaChartLine style={{ marginRight: "7px" }} />
+                                Trade
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )
             )}

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import api from "./api/api";
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
@@ -143,174 +145,178 @@ function PublicRoute({ children }) {
 }
 
 function App() {
+  useEffect(() => {
+    api.get("/health").catch(() => {});
+  }, []);
+  
   return (
     <ToastProvider>
       <ConfirmProvider>
         <BrowserRouter>
-        <Suspense fallback={<PageLoader />}>
-        <ErrorBoundary>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              }
-            />
+          <Suspense fallback={<PageLoader />}>
+            <ErrorBoundary>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
 
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              }
-            />
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
 
-            <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/stocks"
-              element={
-                <ProtectedRoute>
-                  <Stocks />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/stocks"
+                  element={
+                    <ProtectedRoute>
+                      <Stocks />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/stocks/:symbol"
-              element={
-                <ProtectedRoute>
-                  <StockDetails />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/stocks/:symbol"
+                  element={
+                    <ProtectedRoute>
+                      <StockDetails />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/watchlist"
-              element={
-                <ProtectedRoute>
-                  <Watchlist />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/watchlist"
+                  element={
+                    <ProtectedRoute>
+                      <Watchlist />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/portfolio"
-              element={
-                <ProtectedRoute>
-                  <Portfolio />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/portfolio"
+                  element={
+                    <ProtectedRoute>
+                      <Portfolio />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/transactions"
-              element={
-                <ProtectedRoute>
-                  <Transactions />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/transactions"
+                  element={
+                    <ProtectedRoute>
+                      <Transactions />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/orders"
-              element={
-                <ProtectedRoute>
-                  <Orders />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/orders"
+                  element={
+                    <ProtectedRoute>
+                      <Orders />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/analytics"
-              element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/analytics"
+                  element={
+                    <ProtectedRoute>
+                      <Analytics />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/journal"
-              element={
-                <ProtectedRoute>
-                  <TradingJournal />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/journal"
+                  element={
+                    <ProtectedRoute>
+                      <TradingJournal />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/reports"
-              element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/reports"
+                  element={
+                    <ProtectedRoute>
+                      <Reports />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/strategy-backtesting"
-              element={
-                <ProtectedRoute>
-                  <StrategyBacktesting />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/strategy-backtesting"
+                  element={
+                    <ProtectedRoute>
+                      <StrategyBacktesting />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/equity-curve"
-              element={
-                <ProtectedRoute>
-                  <EquityCurve />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/equity-curve"
+                  element={
+                    <ProtectedRoute>
+                      <EquityCurve />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/services"
-              element={
-                <ProtectedRoute>
-                  <Services />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/services"
+                  element={
+                    <ProtectedRoute>
+                      <Services />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          </ErrorBoundary>
-        </Suspense>
-      </BrowserRouter>
-    </ConfirmProvider>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ErrorBoundary>
+          </Suspense>
+        </BrowserRouter>
+      </ConfirmProvider>
     </ToastProvider>
   );
 }
