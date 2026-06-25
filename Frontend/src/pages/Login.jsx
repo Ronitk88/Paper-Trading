@@ -38,33 +38,35 @@ function Login() {
       .join(" ");
   };
 
-  const saveLoginSession = (response) => {
-  const token = response.data?.access_token || response.data?.token;
+    const saveLoginSession = (response) => {
+    const token = response.data?.access_token || response.data?.token;
 
-  if (!token) {
-    console.log("Login response without token:", response.data);
-    alert("Login successful but backend token was not received.");
-    return false;
-  }
+    if (!token) {
+      console.log("Login response without token:", response.data);
+      alert("Login successful but backend token was not received.");
+      return false;
+    }
 
-  const user = response.data?.user || {};
+    const user = response.data?.user || {};
 
-  const displayName =
-    user.username ||
-    user.name ||
-    response.data?.username ||
-    identifier?.split("@")[0] ||
-    "User";
+    const displayName = formatName(
+      user.username ||
+        user.name ||
+        response.data?.username ||
+        identifier?.split("@")[0] ||
+        "User"
+    );
 
-  localStorage.setItem("token", token);
-  localStorage.setItem("username", displayName);
-  localStorage.setItem("email", user.email || response.data?.email || identifier || "");
-  localStorage.setItem("phone", user.phone || response.data?.phone || "");
+    localStorage.setItem("token", token);
+    localStorage.setItem("username", displayName);
+    localStorage.setItem("email", user.email || response.data?.email || identifier || "");
+    localStorage.setItem("phone", user.phone || response.data?.phone || "");
 
-  sessionStorage.removeItem("token");
+    sessionStorage.removeItem("token");
 
-  return true;
-};
+    return true;
+  };
+
   const resetOtpState = () => {
     setOtpCode("");
     setOtpSent(false);
@@ -241,27 +243,27 @@ function Login() {
   };
 
   const handleLogin = async () => {
-  if (!identifier.trim()) {
-    alert(isEmail ? "Email is required" : "Phone number is required");
-    return;
-  }
+    if (!identifier.trim()) {
+      alert(isEmail ? "Email is required" : "Phone number is required");
+      return;
+    }
 
-  if (!password.trim()) {
-    alert("Password is required");
-    return;
-  }
+    if (!password.trim()) {
+      alert("Password is required");
+      return;
+    }
 
-  const response = await API.post("/auth/login", {
-    identifier: identifier.trim(),
-    password,
-  });
+    const response = await API.post("/auth/login", {
+      identifier: identifier.trim(),
+      password,
+    });
 
-  const saved = saveLoginSession(response);
+    const saved = saveLoginSession(response);
 
-  if (!saved) return;
+    if (!saved) return;
 
-  navigate("/dashboard", { replace: true });
-};
+    navigate("/dashboard", { replace: true });
+  };
 
   const handleForgotPassword = async () => {
     try {
@@ -292,31 +294,55 @@ function Login() {
   };
 
   const handleGoogleLogin = async (credentialResponse) => {
-  try {
-    if (!credentialResponse?.credential) {
-      alert("Google login credential not received.");
-      return;
+    try {
+      if (!credentialResponse?.credential) {
+        alert("Google login credential not received.");
+        return;
+      }
+
+      setGoogleLoading(true);
+
+      const response = await API.post("/auth/google", {
+        credential: credentialResponse.credential,
+      });
+
+      const saved = saveLoginSession(response);
+
+      if (!saved) return;
+
+      alert("Google login successful.");
+      navigate("/dashboard", { replace: true });
+    } catch (error) {
+      console.error("Google login failed:", error);
+      alert(error?.response?.data?.detail || "Google login failed");
+    } finally {
+      setGoogleLoading(false);
     }
+  };
 
-    setGoogleLoading(true);
-
-    const response = await API.post("/auth/google", {
-      credential: credentialResponse.credential,
-    });
-
-    const saved = saveLoginSession(response);
-
-    if (!saved) return;
-
-    alert("Google login successful.");
-    navigate("/dashboard", { replace: true });
-  } catch (error) {
-    console.error("Google login failed:", error);
-    alert(error?.response?.data?.detail || "Google login failed");
-  } finally {
+  const handleGoogleError = () => {
     setGoogleLoading(false);
-  }
-};
+    alert("Google login was cancelled or failed.");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      if (isLogin) {
+        await handleLogin();
+      } else {
+        await handleRegister();
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error?.response?.data?.detail || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="login-pro-page">
