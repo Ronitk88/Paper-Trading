@@ -966,7 +966,9 @@ table tbody tr:nth-child(12) { animation-delay: 0.235s; }
 
 .ticker-scroll-wrap {
   width: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  cursor: grab;
   mask-image: linear-gradient(
     to right,
     transparent 0%,
@@ -983,10 +985,14 @@ table tbody tr:nth-child(12) { animation-delay: 0.235s; }
   );
 }
 
+.ticker-scroll-wrap.dragging {
+  cursor: grabbing;
+}
+
 .ticker-scroll-track {
-  display: flex;
-  width: max-content;
-  animation: tickerScroll 40s linear infinite;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .ticker-scroll-track:hover {
@@ -1029,4 +1035,92 @@ table tbody tr:nth-child(12) { animation-delay: 0.235s; }
   100% {
     transform: translateX(-50%);
   }
+}
+
+.global-index-ticker-shell {
+  width: 100%;
+  overflow: hidden;
+  padding: 10px 0;
+  background: rgba(248, 250, 252, 0.92);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.global-index-ticker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: auto;
+  cursor: grab;
+  user-select: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 16px;
+}
+
+.global-index-ticker::-webkit-scrollbar {
+  display: none;
+}
+
+.global-index-ticker.dragging {
+  cursor: grabbing;
+}
+
+.index-pill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(187, 247, 208, 0.95);
+  background: rgba(240, 253, 244, 0.95);
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.index-pill:hover {
+  transform: translateY(-1px);
+  background: #dcfce7;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.index-pill:active {
+  transform: scale(0.98);
+}
+
+.index-label {
+  color: #1e293b;
+}
+
+.index-country {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.index-external-icon {
+  font-size: 10px;
+  color: #2563eb;
+}
+
+.indian-index {
+  border-color: rgba(191, 219, 254, 0.95);
+  background: rgba(239, 246, 255, 0.95);
+}
+
+.indian-index:hover {
+  background: #dbeafe;
+}
+
+.global-index {
+  border-color: rgba(187, 247, 208, 0.95);
+  background: rgba(240, 253, 244, 0.95);
 }

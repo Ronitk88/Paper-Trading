@@ -188,6 +188,20 @@ export function getIndexConfig(countryCode) {
   return INDEX_MAP[countryCode] || INDEX_MAP.IN;
 }
 
+export function isIndianIndexRoute(routeName) {
+  const upper = String(routeName || "").toUpperCase().trim();
+  return ["NIFTY", "SENSEX", "BANKNIFTY"].includes(upper);
+}
+
+export function getAllIndexRoutes() {
+  return Object.entries(INDEX_MAP).flatMap(([countryCode, config]) =>
+    (config.routes || []).map((item) => ({
+      ...item,
+      countryCode,
+    }))
+  );
+}
+
 // ── Reverse lookup: given a route name (e.g. "SPX", "FTSE"), return { tvSymbol, label } ──
 // Used by StockDetails to resolve TradingView symbols for global indexes.
 export function resolveIndexByRoute(routeName) {
@@ -207,6 +221,7 @@ export function resolveIndexByRoute(routeName) {
           tvSymbol: symbolEntry ? symbolEntry.proName : null,
           label: item.label,
           route: item.route,
+          countryCode,
         };
       }
     }
