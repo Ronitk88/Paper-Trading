@@ -40,8 +40,8 @@ function Login() {
   const token = response.data.access_token || response.data.token;
 
   if (!token) {
-    console.log("Login response:", response.data);
-    alert("Login successful but token was not received from backend.");
+    console.log("Login response without token:", response.data);
+    alert("Login successful but backend token was not received.");
     return false;
   }
 
@@ -51,10 +51,12 @@ function Login() {
     user.username ||
     user.name ||
     response.data.username ||
+    formData?.username ||
+    formData?.email?.split("@")[0] ||
     email?.split("@")[0] ||
     "User";
 
-  sessionStorage.setItem("token", response.data.access_token);
+  localStorage.setItem("token", token);
   localStorage.setItem("username", displayName);
   localStorage.setItem("email", user.email || response.data.email || email || "");
   localStorage.setItem("phone", user.phone || response.data.phone || phone || "");
@@ -253,6 +255,7 @@ function Login() {
     });
 
     const saved = saveLoginSession(response);
+if (!saved) return;
 
 if (!saved) return;
   };
@@ -299,7 +302,8 @@ if (!saved) return;
       });
 
       alert("Google login successful.");
-      saveLoginSession(response);
+      const saved = saveLoginSession(response);
+if (!saved) return;
     } catch (error) {
       console.error("Google login failed:", error);
       alert(error?.response?.data?.detail || "Google login failed");
