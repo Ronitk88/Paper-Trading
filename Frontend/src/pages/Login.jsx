@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import API from "../api/api";
@@ -5,6 +6,7 @@ import API from "../api/api";
 function Login() {
   const [mode, setMode] = useState("login");
   const [loginMethod, setLoginMethod] = useState("email");
+  const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [identifier, setIdentifier] = useState("");
@@ -37,7 +39,7 @@ function Login() {
   };
 
   const saveLoginSession = (response) => {
-  const token = response.data.access_token || response.data.token;
+  const token = response.data?.access_token || response.data?.token;
 
   if (!token) {
     console.log("Login response without token:", response.data);
@@ -45,21 +47,21 @@ function Login() {
     return false;
   }
 
-  const user = response.data.user || {};
+  const user = response.data?.user || {};
 
   const displayName =
     user.username ||
     user.name ||
-    response.data.username ||
-    formData?.username ||
-    formData?.email?.split("@")[0] ||
-    email?.split("@")[0] ||
+    response.data?.username ||
+    identifier?.split("@")[0] ||
     "User";
 
   localStorage.setItem("token", token);
   localStorage.setItem("username", displayName);
-  localStorage.setItem("email", user.email || response.data.email || email || "");
-  localStorage.setItem("phone", user.phone || response.data.phone || phone || "");
+  localStorage.setItem("email", user.email || response.data?.email || identifier || "");
+  localStorage.setItem("phone", user.phone || response.data?.phone || "");
+
+  sessionStorage.removeItem("token");
 
   return true;
 };
@@ -239,26 +241,27 @@ function Login() {
   };
 
   const handleLogin = async () => {
-    if (!identifier.trim()) {
-      alert(isEmail ? "Email is required" : "Phone number is required");
-      return;
-    }
+  if (!identifier.trim()) {
+    alert(isEmail ? "Email is required" : "Phone number is required");
+    return;
+  }
 
-    if (!password.trim()) {
-      alert("Password is required");
-      return;
-    }
+  if (!password.trim()) {
+    alert("Password is required");
+    return;
+  }
 
-    const response = await API.post("/auth/login", {
-      identifier: identifier.trim(),
-      password,
-    });
+  const response = await API.post("/auth/login", {
+    identifier: identifier.trim(),
+    password,
+  });
 
-    const saved = saveLoginSession(response);
-if (!saved) return;
+  const saved = saveLoginSession(response);
 
-if (!saved) return;
-  };
+  if (!saved) return;
+
+  navigate("/dashboard", { replace: true });
+};
 
   const handleForgotPassword = async () => {
     try {
@@ -289,51 +292,31 @@ if (!saved) return;
   };
 
   const handleGoogleLogin = async (credentialResponse) => {
-    try {
-      if (!credentialResponse?.credential) {
-        alert("Google login credential not received.");
-        return;
-      }
-
-      setGoogleLoading(true);
-
-      const response = await API.post("/auth/google", {
-        credential: credentialResponse.credential,
-      });
-
-      alert("Google login successful.");
-      const saved = saveLoginSession(response);
-if (!saved) return;
-    } catch (error) {
-      console.error("Google login failed:", error);
-      alert(error?.response?.data?.detail || "Google login failed");
-    } finally {
-      setGoogleLoading(false);
+  try {
+    if (!credentialResponse?.credential) {
+      alert("Google login credential not received.");
+      return;
     }
-  };
 
-  const handleGoogleError = () => {
-    alert("Google login was cancelled or failed.");
-  };
+    setGoogleLoading(true);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const response = await API.post("/auth/google", {
+      credential: credentialResponse.credential,
+    });
 
-    try {
-      setLoading(true);
+    const saved = saveLoginSession(response);
 
-      if (isLogin) {
-        await handleLogin();
-      } else {
-        await handleRegister();
-      }
-    } catch (error) {
-      console.error(error);
-      alert(error?.response?.data?.detail || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+    if (!saved) return;
+
+    alert("Google login successful.");
+    navigate("/dashboard", { replace: true });
+  } catch (error) {
+    console.error("Google login failed:", error);
+    alert(error?.response?.data?.detail || "Google login failed");
+  } finally {
+    setGoogleLoading(false);
+  }
+};
 
   return (
     <div className="login-pro-page">
