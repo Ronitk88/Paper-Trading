@@ -115,7 +115,12 @@ function Settings() {
       sessionStorage.setItem("phone", profileData.phone || "");
     } catch (err) {
       console.error("Settings load failed:", err);
-      alert("Unable to load settings.");
+      const status = err?.response?.status;
+      if (status === 401 || status === 404) {
+        handleLogout();
+      } else {
+        alert("Unable to load settings.");
+      }
     } finally {
       setLoading(false);
     }

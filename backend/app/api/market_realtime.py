@@ -133,6 +133,86 @@ async def websocket_realtime_candles(
             pass
 
 
+@router.websocket("/ws/ltp/{exchange}/{symboltoken}")
+async def websocket_realtime_ltp(
+    websocket: WebSocket,
+    exchange: str,
+    symboltoken: str,
+):
+    try:
+        exchange, symboltoken, symbol_key = normalize_instrument(
+            exchange,
+            symboltoken,
+        )
+        await websocket.accept()
+        market_stream.subscribe(exchange, symboltoken)
+
+        last_version = -1
+        last_heartbeat = 0.0
+
+        try:
+            initial_quote = market_state.get_quote(exchange, symboltoken)
+            if initial_quote:
+                ltp = initial_quote.get("ltp")
+                prev_close = initial_quote.get("previous_close") or 0.0
+                change = ltp - prev_close if ltp is not None and prev_close > 0 else 0.0
+                change_percent = (change / prev_close) * 100 if prev_close > 0 else 0.0
+
+                await websocket.send_json({
+                    "type": "initial_data",
+                    "ltp": ltp,
+                    "change": change,
+                    "change_percent": change_percent,
+                    "exchange_timestamp": initial_quote.get("exchange_timestamp"),
+                    "latency_ms": initial_quote.get("latency_ms"),
+                    "feed": market_stream.status(),
+                })
+
+            while True:
+                version = market_state.get_version(symbol_key)
+                loop_time = asyncio.get_running_loop().time()
+
+                if version != last_version:
+                    quote = market_state.get_quote(exchange, symboltoken)
+                    if quote:
+                        last_version = version
+                        last_heartbeat = loop_time
+                        ltp = quote.get("ltp")
+                        prev_close = quote.get("previous_close") or 0.0
+                        change = ltp - prev_close if ltp is not None and prev_close > 0 else 0.0
+                        change_percent = (change / prev_close) * 100 if prev_close > 0 else 0.0
+
+                        await websocket.send_json({
+                            "type": "market_update",
+                            "ltp": ltp,
+                            "change": change,
+                            "change_percent": change_percent,
+                            "exchange_timestamp": quote.get("exchange_timestamp"),
+                            "latency_ms": quote.get("latency_ms"),
+                            "feed": market_stream.status(),
+                        })
+                elif loop_time - last_heartbeat >= 15:
+                    last_heartbeat = loop_time
+                    await websocket.send_json({
+                        "type": "pong",
+                        "server_time": datetime.now(IST).isoformat(),
+                        "feed": market_stream.status(),
+                    })
+
+                await asyncio.sleep(0.05)
+        except (WebSocketDisconnect, RuntimeError):
+            pass
+        finally:
+            market_stream.unsubscribe(exchange, symboltoken)
+    except ValueError as exc:
+        await websocket.close(code=1008, reason=str(exc)[:120])
+    except Exception:
+        try:
+            await websocket.close(code=1011, reason="Live feed unavailable")
+        except RuntimeError:
+            pass
+
+
 @router.websocket("/ws/quotes")
 async def websocket_realtime_quotes(
     websocket: WebSocket,

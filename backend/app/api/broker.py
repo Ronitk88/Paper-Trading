@@ -74,8 +74,32 @@ def get_broker_credentials(
 ):
     """Return masked broker credentials for UI display."""
     cred = _get_or_create_broker_credential(db)
+    d = cred.to_masked_dict()
 
-    return cred.to_masked_dict()
+    def mask_val(val):
+        if not val:
+            return ""
+        if len(val) <= 8:
+            return val[:2] + "*" * (len(val) - 2) + val[-2:] if len(val) > 4 else "****"
+        return val[:4] + "****" + val[-4:]
+
+    if not d.get("api_key_masked"):
+        env_api_key = os.getenv("ANGELONE_API_KEY")
+        if env_api_key:
+            d["api_key_masked"] = mask_val(env_api_key)
+
+    if not d.get("client_code_masked"):
+        env_client = os.getenv("ANGELONE_CLIENT_CODE")
+        if env_client:
+            d["client_code_masked"] = mask_val(env_client)
+
+    if not d.get("secret_key_masked"):
+        env_secret = os.getenv("ANGELONE_SECRET_KEY")
+        if env_secret:
+            d["secret_key_masked"] = mask_val(env_secret)
+
+    return d
+
 
 
 @router.put("/credentials")
@@ -197,8 +221,8 @@ def get_broker_status(
         "connection_status": cred.connection_status,
         "last_connected_at": cred.last_connected_at.isoformat() if cred.last_connected_at else None,
         "is_active": cred.is_active,
-        "websocket_connected": feed_status.get("running", False),
-        "websocket_subscriptions": feed_status.get("subscription_count", 0),
+        "websocket_connected": feed_status.get("connected", False),
+        "websocket_subscriptions": feed_status.get("active_instruments", 0),
         "credentials_configured": bool(
             cred.api_key
             or os.getenv("ANGELONE_API_KEY")
@@ -210,6 +234,7 @@ def get_broker_config_status():
     api_key = (
         os.getenv("ANGEL_API_KEY")
         or os.getenv("ANGEL_ONE_API_KEY")
+        or os.getenv("ANGELONE_API_KEY")
         or os.getenv("SMARTAPI_API_KEY")
     )
 
@@ -217,17 +242,21 @@ def get_broker_config_status():
         os.getenv("ANGEL_CLIENT_ID")
         or os.getenv("ANGEL_CLIENT_CODE")
         or os.getenv("ANGEL_ONE_CLIENT_CODE")
+        or os.getenv("ANGELONE_CLIENT_CODE")
         or os.getenv("SMARTAPI_CLIENT_CODE")
     )
 
     password = (
         os.getenv("ANGEL_PASSWORD")
         or os.getenv("ANGEL_PIN")
+        or os.getenv("ANGELONE_PASSWORD")
         or os.getenv("SMARTAPI_PASSWORD")
     )
 
     totp_secret = (
         os.getenv("ANGEL_TOTP_SECRET")
+        or os.getenv("ANGEL_ONE_TOTP_SECRET")
+        or os.getenv("ANGELONE_TOTP_SECRET")
         or os.getenv("SMARTAPI_TOTP_SECRET")
     )
 

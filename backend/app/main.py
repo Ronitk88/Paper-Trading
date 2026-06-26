@@ -150,6 +150,7 @@ def broker_config_status():
     angel_api_key = (
         os.getenv("ANGEL_API_KEY")
         or os.getenv("ANGEL_ONE_API_KEY")
+        or os.getenv("ANGELONE_API_KEY")
         or os.getenv("SMARTAPI_API_KEY")
     )
 
@@ -157,18 +158,21 @@ def broker_config_status():
         os.getenv("ANGEL_CLIENT_CODE")
         or os.getenv("ANGEL_CLIENT_ID")
         or os.getenv("ANGEL_ONE_CLIENT_CODE")
+        or os.getenv("ANGELONE_CLIENT_CODE")
         or os.getenv("SMARTAPI_CLIENT_CODE")
     )
 
     angel_password = (
         os.getenv("ANGEL_PASSWORD")
         or os.getenv("ANGEL_PIN")
+        or os.getenv("ANGELONE_PASSWORD")
         or os.getenv("SMARTAPI_PASSWORD")
     )
 
     angel_totp_secret = (
         os.getenv("ANGEL_TOTP_SECRET")
         or os.getenv("ANGEL_ONE_TOTP_SECRET")
+        or os.getenv("ANGELONE_TOTP_SECRET")
         or os.getenv("SMARTAPI_TOTP_SECRET")
     )
 
