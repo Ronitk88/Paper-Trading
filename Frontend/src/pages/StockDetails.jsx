@@ -23,6 +23,7 @@ function StockDetails() {
   const [marketStatus, setMarketStatus] = useState(null);
   const [currentHolding, setCurrentHolding] = useState(null);
   const [portfolioCash, setPortfolioCash] = useState(0);
+  const [clockTime, setClockTime] = useState("");
 
   const [quantity, setQuantity] = useState(1);
   const [orderType, setOrderType] = useState("MARKET");
@@ -64,6 +65,35 @@ function StockDetails() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol]);
+
+  // ── Live Ticking Market Clock ──
+  useEffect(() => {
+    if (!marketStatus?.current_time) return;
+
+    const serverTimeMs = new Date(marketStatus.current_time).getTime();
+    if (isNaN(serverTimeMs)) {
+      setClockTime(marketStatus.current_time);
+      return;
+    }
+
+    const offset = serverTimeMs - Date.now();
+
+    const updateClock = () => {
+      const d = new Date(Date.now() + offset);
+      const day = String(d.getDate()).padStart(2, "0");
+      const monthStr = d.toLocaleString("en-GB", { month: "short" });
+      const year = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      const ss = String(d.getSeconds()).padStart(2, "0");
+      setClockTime(`${day} ${monthStr} ${year}, ${hh}:${mm}:${ss}`);
+    };
+
+    updateClock(); // Set immediately
+    const timer = setInterval(updateClock, 1000);
+
+    return () => clearInterval(timer);
+  }, [marketStatus?.current_time]);
 
   const formatMoney = (value) => {
     if (value === null || value === undefined || value === "") return "-";
@@ -769,9 +799,9 @@ function StockDetails() {
                   </span>
                 </div>
 
-                {marketStatus?.current_time && (
+                {(clockTime || marketStatus?.current_time) && (
                   <p style={{ color: "#bfdbfe", marginTop: "10px", fontWeight: "700" }}>
-                    Market clock: {marketStatus.current_time}
+                    Market clock: {clockTime || marketStatus.current_time}
                   </p>
                 )}
               </div>
