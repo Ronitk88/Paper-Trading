@@ -10,6 +10,32 @@
   display: none !important;
 }
 
+/* ───── DESKTOP FIXED SIDEBAR OVERRIDES ───── */
+@media (min-width: 769px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 270px !important;
+    height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    z-index: 1000 !important;
+    overflow-y: auto !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+  }
+
+  .sidebar-footer {
+    margin-top: auto !important; /* Push cash box and logout to bottom, leaving no blank space */
+    padding-top: 24px !important;
+  }
+
+  .dashboard-main {
+    margin-left: 270px !important; /* Displace page content for the fixed sidebar */
+  }
+}
+
 /* Utility colors & indicators */
 .live-price-up { color: #16a34a !important; }
 .live-price-down { color: #dc2626 !important; }
@@ -39,11 +65,41 @@ html, body {
    MEDIA QUERY: Tablets & Mobile Devices (max-width: 768px)
    ========================================================================== */
 @media (max-width: 768px) {
-  /* Hide Desktop navigation controls */
-  .sidebar, 
-  .sidebar-backdrop, 
+  /* Mobile Sliding Drawer & Hamburger Trigger */
   .mobile-hamburger-btn {
-    display: none !important;
+    display: flex !important;
+  }
+
+  .sidebar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 270px !important;
+    height: 100vh !important;
+    z-index: 100000 !important;
+    transform: translateX(-270px) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 16px 0 60px rgba(15, 23, 42, 0.35) !important;
+    overflow-y: auto !important;
+    flex-direction: column !important;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-backdrop {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(15, 23, 42, 0.4) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 99990 !important;
   }
 
   /* Full screen view adjustment */
