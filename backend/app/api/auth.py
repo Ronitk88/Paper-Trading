@@ -13,7 +13,7 @@ import smtplib
 from email.message import EmailMessage
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -371,6 +371,7 @@ def register_user(
 @router.post("/login")
 def login_user(
     user: UserLogin,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     identifier = user.identifier.strip()
@@ -414,7 +415,8 @@ def login_user(
         email = getattr(db_user, "email", "")
         if email:
             from app.services.email_service import send_email
-            send_email(
+            background_tasks.add_task(
+                send_email,
                 to_email=email,
                 subject="New Login to Paper Trading Account",
                 html_body=f"""

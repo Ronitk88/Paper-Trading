@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import API from "../api/api";
 
@@ -19,6 +19,36 @@ function Login() {
 
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleWidth, setGoogleWidth] = useState(() => {
+    const width = window.innerWidth;
+    if (width < 480) {
+      return Math.max(200, Math.min(360, width - 80)).toString();
+    }
+    return "360";
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 480) {
+        setGoogleWidth(Math.max(200, Math.min(360, width - 80)).toString());
+      } else {
+        setGoogleWidth("360");
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const prefetchDashboard = () => {
+      import("./Dashboard").catch((err) => {
+        console.warn("Failed to prefetch Dashboard chunk:", err);
+      });
+    };
+    const timer = setTimeout(prefetchDashboard, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [forgotOpen, setForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -453,7 +483,7 @@ function Login() {
               text={isLogin ? "signin_with" : "signup_with"}
               shape="pill"
               size="large"
-              width="360"
+              width={googleWidth}
             />
           </div>
         </div>
