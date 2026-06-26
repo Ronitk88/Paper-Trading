@@ -52,9 +52,10 @@
 }
 
 /* Base resets & scroll behavior */
-html, body {
+html, body, .dashboard-layout, .dashboard-main, .dashboard-content {
   overflow-x: hidden !important;
   max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .table-scroll::-webkit-scrollbar {
@@ -122,13 +123,18 @@ html, body {
     padding: 16px 12px !important;
   }
 
-  /* Stacked & Compact Navbar */
+  /* Grid-Based Compact Navbar */
   .navbar {
-    display: flex !important;
-    flex-direction: column !important;
+    display: grid !important;
+    grid-template-areas: 
+      "hamburger right"
+      "ticker ticker"
+      "search search" !important;
+    grid-template-columns: auto 1fr !important;
+    align-items: center !important;
     height: auto !important;
     padding: 12px 14px !important;
-    gap: 8px !important;
+    gap: 12px 14px !important;
     border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
     background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(20px) !important;
@@ -139,30 +145,59 @@ html, body {
     box-shadow: 0 4px 18px rgba(15, 23, 42, 0.02) !important;
   }
 
+  .mobile-hamburger-btn {
+    grid-area: hamburger !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
   .navbar-ticker-wrap {
-    order: 1 !important;
+    grid-area: ticker !important;
     width: 100% !important;
-    margin: 0 0 4px 0 !important;
+    margin: 0 !important;
     border-radius: 10px !important;
     overflow: hidden !important;
   }
 
   .navbar-right {
-    order: 2 !important;
-    width: 100% !important;
-    margin-left: 0 !important;
+    grid-area: right !important;
+    width: auto !important;
+    margin-left: auto !important;
     display: flex !important;
-    justify-content: space-between !important;
+    justify-content: flex-end !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 14px !important;
   }
 
   .navbar-date {
     display: none !important; /* Hide date on small viewports for space */
   }
 
+  .navbar-right .user-box {
+    order: 1 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+
+  .navbar-right .user-box span,
+  .navbar-right .user-box svg {
+    display: none !important;
+  }
+
+  .navbar-right > div:not(.navbar-date) {
+    order: 2 !important;
+  }
+
   .search-box {
-    order: 3 !important;
+    grid-area: search !important;
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
