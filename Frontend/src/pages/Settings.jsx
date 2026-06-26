@@ -17,6 +17,7 @@ import BrokerConfiguration from "../components/BrokerConfiguration";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { useConfirm } from "../components/ConfirmProvider";
 import api from "../api/api";
+import LogoutModal from "../components/LogoutModal";
 
 function Settings() {
   const navigate = useNavigate();
@@ -137,6 +138,44 @@ function Settings() {
     return Number(value || 0).toLocaleString("en-IN");
   };
 
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutNow = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("username");
+    sessionStorage.removeItem("email");
+    sessionStorage.removeItem("phone");
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("email");
+    localStorage.removeItem("phone");
+    localStorage.removeItem("session_expiry");
+
+    setShowLogoutModal(false);
+    navigate("/");
+  };
+
+  const handleStayLoggedIn = (selectedTimestamp) => {
+    const token = sessionStorage.getItem("token") || localStorage.getItem("token");
+    const username = sessionStorage.getItem("username") || localStorage.getItem("username");
+    const email = sessionStorage.getItem("email") || localStorage.getItem("email");
+    const phone = sessionStorage.getItem("phone") || localStorage.getItem("phone");
+
+    localStorage.setItem("token", token || "");
+    localStorage.setItem("username", username || "");
+    localStorage.setItem("email", email || "");
+    localStorage.setItem("phone", phone || "");
+    localStorage.setItem("session_expiry", String(selectedTimestamp));
+
+    setShowLogoutModal(false);
+    alert(`Session will remain active until: ${new Date(selectedTimestamp).toLocaleString("en-IN")}`);
+  };
+
   const handleLogout = () => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("username");
@@ -147,6 +186,7 @@ function Settings() {
     localStorage.removeItem("username");
     localStorage.removeItem("email");
     localStorage.removeItem("phone");
+    localStorage.removeItem("session_expiry");
 
     navigate("/");
   };
@@ -743,7 +783,7 @@ function Settings() {
                     <button
                       type="button"
                       className="market-card-item market-clickable"
-                      onClick={handleLogout}
+                      onClick={handleLogoutClick}
                     >
                       <span>Logout Session</span>
                       <strong>
@@ -786,6 +826,12 @@ function Settings() {
           </div>
         </div>
       </div>
+      <LogoutModal
+        open={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onLogoutNow={handleLogoutNow}
+        onStayLoggedIn={handleStayLoggedIn}
+      />
     </div>
   );
 }

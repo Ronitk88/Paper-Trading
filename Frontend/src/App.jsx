@@ -145,6 +145,31 @@ function PublicRoute({ children }) {
 }
 
 function App() {
+  useMemo(() => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      const localToken = localStorage.getItem("token");
+      const expiry = localStorage.getItem("session_expiry");
+      if (localToken && expiry) {
+        const expTime = Number(expiry);
+        if (Date.now() < expTime) {
+          // Restore session to sessionStorage
+          sessionStorage.setItem("token", localToken);
+          sessionStorage.setItem("username", localStorage.getItem("username") || "");
+          sessionStorage.setItem("email", localStorage.getItem("email") || "");
+          sessionStorage.setItem("phone", localStorage.getItem("phone") || "");
+        } else {
+          // Session expired
+          localStorage.removeItem("token");
+          localStorage.removeItem("username");
+          localStorage.removeItem("email");
+          localStorage.removeItem("phone");
+          localStorage.removeItem("session_expiry");
+        }
+      }
+    }
+  }, []);
+
   useEffect(() => {
     api.get("/health").catch(() => {});
   }, []);

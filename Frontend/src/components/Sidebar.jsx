@@ -20,6 +20,7 @@ import {
 } from "react-icons/fa";
 
 import api from "../api/api";
+import LogoutModal from "./LogoutModal";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -27,6 +28,21 @@ function Sidebar() {
 
   const [cashBalance, setCashBalance] = useState(0);
   const [isAdmin, setIsAdmin] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  useEffect(() => {
+    const handleToggle = () => setIsOpen((prev) => !prev);
+    const handleClose = () => setIsOpen(false);
+
+    window.addEventListener("toggle-sidebar", handleToggle);
+    window.addEventListener("close-sidebar", handleClose);
+
+    return () => {
+      window.removeEventListener("toggle-sidebar", handleToggle);
+      window.removeEventListener("close-sidebar", handleClose);
+    };
+  }, []);
 
   useEffect(() => {
     loadCashBalance();
@@ -59,7 +75,17 @@ function Sidebar() {
     });
   };
 
-  const logout = () => {
+  const handleItemClick = (path) => {
+    navigate(path);
+    setIsOpen(false);
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+    setIsOpen(false);
+  };
+
+  const handleLogoutNow = () => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("username");
     sessionStorage.removeItem("email");
@@ -69,8 +95,26 @@ function Sidebar() {
     localStorage.removeItem("username");
     localStorage.removeItem("email");
     localStorage.removeItem("phone");
+    localStorage.removeItem("session_expiry");
 
+    setShowLogoutModal(false);
     navigate("/");
+  };
+
+  const handleStayLoggedIn = (selectedTimestamp) => {
+    const token = sessionStorage.getItem("token") || localStorage.getItem("token");
+    const username = sessionStorage.getItem("username") || localStorage.getItem("username");
+    const email = sessionStorage.getItem("email") || localStorage.getItem("email");
+    const phone = sessionStorage.getItem("phone") || localStorage.getItem("phone");
+
+    localStorage.setItem("token", token || "");
+    localStorage.setItem("username", username || "");
+    localStorage.setItem("email", email || "");
+    localStorage.setItem("phone", phone || "");
+    localStorage.setItem("session_expiry", String(selectedTimestamp));
+
+    setShowLogoutModal(false);
+    alert(`Session will remain active until: ${new Date(selectedTimestamp).toLocaleString("en-IN")}`);
   };
 
   const menuItems = [
@@ -159,50 +203,75 @@ function Sidebar() {
   };
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-top">
+    <>
+      {isOpen && (
         <div
-          className="logo"
-          onClick={() => navigate("/dashboard")}
-          style={{ cursor: "pointer" }}
-        >
-          <FaShieldAlt style={{ marginRight: "8px" }} />
-          PaperTrade Pro
-        </div>
-
-        <ul>
-          {menuItems.map((item) => (
-            <li
-              key={item.path}
-              className={isActive(item.path) ? "active" : ""}
-              onClick={() => navigate(item.path)}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="sidebar-footer">
-        <div className="cash-box">
-          <div>
-            <p>Available Cash</p>
-            <h3>₹{formatMoney(cashBalance)}</h3>
+          className="sidebar-backdrop"
+          onClick={() => setIsOpen(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(15, 23, 42, 0.4)",
+            backdropFilter: "blur(4px)",
+            zIndex: 99990,
+          }}
+        />
+      )}
+      <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
+        <div className="sidebar-top">
+          <div
+            className="logo"
+            onClick={() => handleItemClick("/dashboard")}
+            style={{ cursor: "pointer" }}
+          >
+            <FaShieldAlt style={{ marginRight: "8px" }} />
+            PaperTrade Pro
           </div>
 
-          <div>
-            <p>Mode</p>
-            <h4>Paper Trading</h4>
-          </div>
+          <ul>
+            {menuItems.map((item) => (
+              <li
+                key={item.path}
+                className={isActive(item.path) ? "active" : ""}
+                onClick={() => handleItemClick(item.path)}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <button className="logout-btn" onClick={logout}>
-          <FaSignOutAlt style={{ marginRight: "8px" }} />
-          Logout
-        </button>
-      </div>
-    </aside>
+        <div className="sidebar-footer">
+          <div className="cash-box">
+            <div>
+              <p>Available Cash</p>
+              <h3>₹{formatMoney(cashBalance)}</h3>
+            </div>
+
+            <div>
+              <p>Mode</p>
+              <h4>Paper Trading</h4>
+            </div>
+          </div>
+
+          <button className="logout-btn" onClick={handleLogoutClick}>
+            <FaSignOutAlt style={{ marginRight: "8px" }} />
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <LogoutModal
+        open={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onLogoutNow={handleLogoutNow}
+        onStayLoggedIn={handleStayLoggedIn}
+      />
+    </>
   );
 }
 

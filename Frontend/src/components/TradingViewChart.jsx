@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FaExpand, FaCompress } from "react-icons/fa";
 import api from "../api/api";
 import { buildRealtimeUrl } from "../api/realtime";
 
@@ -126,6 +127,8 @@ function TradingViewChart({
   const [liveLtp, setLiveLtp] = useState(null);
   const [liveChange, setLiveChange] = useState(null);
   const [liveChangePercent, setLiveChangePercent] = useState(null);
+  const [isEnlarged, setIsEnlarged] = useState(false);
+  const [hoverInfo, setHoverInfo] = useState(null);
 
   const loadingRef = useRef(false);
   const wsRef = useRef(null);
@@ -441,11 +444,44 @@ function TradingViewChart({
       visibleCandles[visibleCandles.length - 1]?.close || 0
     );
 
+    const handleMouseMove = (e) => {
+      const bounds = e.currentTarget.getBoundingClientRect();
+      const svgY = ((e.clientY - bounds.top) / bounds.height) * height;
+      const svgX = ((e.clientX - bounds.left) / bounds.width) * width;
+
+      if (
+        svgY >= topPad &&
+        svgY <= height - bottomPad &&
+        svgX >= leftPad &&
+        svgX <= width - rightPad
+      ) {
+        const price = maxPrice - ((svgY - topPad) / chartHeight) * priceRange;
+        const index = Math.min(
+          visibleCandles.length - 1,
+          Math.max(0, Math.round((svgX - leftPad - step / 2) / step))
+        );
+        const candle = visibleCandles[index];
+        const snappedX = leftPad + index * step + step / 2;
+        setHoverInfo({ x: snappedX, y: svgY, price, time: candle?.time });
+        if (candle) {
+          setSelectedCandle(candle);
+        }
+      } else {
+        setHoverInfo(null);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      setHoverInfo(null);
+    };
+
     return (
       <svg
         viewBox={`0 0 ${width} ${height}`}
         style={{ width: "100%", height: "430px", display: "block" }}
         aria-label={`${displayName || tradingsymbol} candlestick chart`}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
       >
         <rect width={width} height={height} fill="#ffffff" rx="16" />
 
@@ -590,6 +626,70 @@ function TradingViewChart({
         >
           {visibleCandles[visibleCandles.length - 1]?.time}
         </text>
+        {hoverInfo && (
+          <g key="hover-guide">
+            {/* Horizontal Line */}
+            <line
+              x1={leftPad}
+              x2={width - rightPad}
+              y1={hoverInfo.y}
+              y2={hoverInfo.y}
+              stroke="#6366f1"
+              strokeDasharray="3 3"
+              strokeWidth="1.5"
+            />
+            <rect
+              x="5"
+              y={hoverInfo.y - 10}
+              width="56"
+              height="20"
+              rx="4"
+              fill="#6366f1"
+            />
+            <text
+              x="8"
+              y={hoverInfo.y + 4}
+              fontSize="10"
+              fill="#ffffff"
+              fontWeight="900"
+            >
+              ₹{formatMoney(hoverInfo.price)}
+            </text>
+
+            {/* Vertical Line */}
+            <line
+              x1={hoverInfo.x}
+              x2={hoverInfo.x}
+              y1={topPad}
+              y2={height - bottomPad}
+              stroke="#6366f1"
+              strokeDasharray="3 3"
+              strokeWidth="1.5"
+            />
+            {hoverInfo.time && (
+              <g>
+                <rect
+                  x={Math.max(leftPad, Math.min(width - rightPad - 130, hoverInfo.x - 65))}
+                  y={height - bottomPad + 4}
+                  width="130"
+                  height="20"
+                  rx="4"
+                  fill="#6366f1"
+                />
+                <text
+                  x={Math.max(leftPad + 65, Math.min(width - rightPad - 65, hoverInfo.x))}
+                  y={height - bottomPad + 18}
+                  fontSize="10"
+                  fill="#ffffff"
+                  fontWeight="900"
+                  textAnchor="middle"
+                >
+                  {hoverInfo.time}
+                </text>
+              </g>
+            )}
+          </g>
+        )}
       </svg>
     );
   };
@@ -597,15 +697,45 @@ function TradingViewChart({
   const isLive = wsStatus === "Live";
 
   return (
-    <div
-      style={{
-        width: "100%",
-        border: "1px solid #e5e7eb",
-        borderRadius: "16px",
-        background: "#ffffff",
-        overflow: "hidden",
-      }}
-    >
+    <>
+      {isEnlarged && (
+        <div
+          onClick={() => setIsEnlarged(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(15, 23, 42, 0.4)",
+            backdropFilter: "blur(4px)",
+            zIndex: 99998,
+          }}
+        />
+      )}
+      <div
+        style={isEnlarged ? {
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "95vw",
+          maxWidth: "1200px",
+          height: "auto",
+          zIndex: 99999,
+          border: "1px solid #e5e7eb",
+          borderRadius: "16px",
+          background: "#ffffff",
+          overflow: "hidden",
+          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        } : {
+          width: "100%",
+          border: "1px solid #e5e7eb",
+          borderRadius: "16px",
+          background: "#ffffff",
+          overflow: "hidden",
+        }}
+      >
       <div
         style={{
           padding: "18px 18px 14px",
@@ -665,6 +795,27 @@ function TradingViewChart({
             }}
           >
             {loading ? "Fetching…" : "Refresh history"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsEnlarged(!isEnlarged)}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "999px",
+              border: "1px solid #d1d5db",
+              background: "#f8fafc",
+              color: "#475569",
+              fontWeight: "900",
+              cursor: "pointer",
+              fontSize: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+            title={isEnlarged ? "Collapse Chart" : "Enlarge Chart"}
+          >
+            {isEnlarged ? <FaCompress /> : <FaExpand />}
+            {isEnlarged ? "Collapse" : "Enlarge"}
           </button>
         </div>
       </div>
@@ -831,6 +982,7 @@ function TradingViewChart({
         </a>
       </div>
     </div>
+  </>
   );
 }
 

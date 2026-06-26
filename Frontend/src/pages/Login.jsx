@@ -57,12 +57,16 @@ function Login() {
         "User"
     );
 
-    localStorage.setItem("token", token);
-    localStorage.setItem("username", displayName);
-    localStorage.setItem("email", user.email || response.data?.email || identifier || "");
-    localStorage.setItem("phone", user.phone || response.data?.phone || "");
+    sessionStorage.setItem("token", token);
+    sessionStorage.setItem("username", displayName);
+    sessionStorage.setItem("email", user.email || response.data?.email || identifier || "");
+    sessionStorage.setItem("phone", user.phone || response.data?.phone || "");
 
-    sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("email");
+    localStorage.removeItem("phone");
+    localStorage.removeItem("session_expiry");
 
     return true;
   };
@@ -310,7 +314,6 @@ function Login() {
 
       if (!saved) return;
 
-      alert("Google login successful.");
       navigate("/dashboard", { replace: true });
     } catch (error) {
       console.error("Google login failed:", error);

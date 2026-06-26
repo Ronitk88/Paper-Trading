@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaBell, FaCalendarAlt, FaSearch, FaUserCog } from "react-icons/fa";
+import { FaBell, FaCalendarAlt, FaSearch, FaUserCog, FaBars } from "react-icons/fa";
 import LiveMarketTicker from "./LiveMarketTicker";
 import MobileBottomNav from "./MobileBottomNav";
 import api from "../api/api";
@@ -113,6 +113,26 @@ function Navbar() {
   return (
     <>
       <div className="navbar">
+        <button 
+          type="button" 
+          className="mobile-hamburger-btn"
+          onClick={() => window.dispatchEvent(new CustomEvent("toggle-sidebar"))}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "22px",
+            color: "#475569",
+            cursor: "pointer",
+            padding: "8px",
+            marginRight: "4px",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          title="Open Menu"
+        >
+          <FaBars />
+        </button>
+
         <div className="navbar-ticker-wrap">
           <LiveMarketTicker variant="strip" />
         </div>
