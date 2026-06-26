@@ -21,20 +21,24 @@ function Login() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleWidth, setGoogleWidth] = useState(() => {
     const width = window.innerWidth;
-    if (width < 480) {
-      return Math.max(200, Math.min(360, width - 80)).toString();
-    }
+    if (width < 350) return "250";
+    if (width < 400) return "290";
+    if (width < 480) return "320";
     return "360";
   });
 
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width < 480) {
-        setGoogleWidth(Math.max(200, Math.min(360, width - 80)).toString());
-      } else {
-        setGoogleWidth("360");
+      let newWidth = "360";
+      if (width < 350) {
+        newWidth = "250";
+      } else if (width < 400) {
+        newWidth = "290";
+      } else if (width < 480) {
+        newWidth = "320";
       }
+      setGoogleWidth(newWidth);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
