@@ -519,6 +519,10 @@ html, body, .dashboard-layout, .dashboard-main, .dashboard-content {
     margin-bottom: 6px !important;
     width: 100% !important;
     max-width: 100% !important;
+    flex: none !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
   }
 
   .dashboard-layout .pro-table td[data-label="Action"] > div,
@@ -617,6 +621,17 @@ html, body, .dashboard-layout, .dashboard-main, .dashboard-content {
   .pro-table td[data-label="Company"] > div {
     width: 100% !important;
     text-align: left !important;
+  }
+
+  .dashboard-layout .pro-table td[data-label="Company"]::before,
+  .pro-table td[data-label="Company"]::before {
+    margin-bottom: 6px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
   }
 
   /* Trading Journal overrides */
