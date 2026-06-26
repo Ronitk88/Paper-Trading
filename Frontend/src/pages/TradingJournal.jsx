@@ -43,7 +43,7 @@ function TradingJournal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  const loadJournal = async (pageNumber = page, searchValue = search) => {
+  async function loadJournal(pageNumber = page, searchValue = search) {
     try {
       setLoading(true);
 

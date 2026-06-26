@@ -37,7 +37,7 @@ function Watchlist() {
     return () => clearInterval(interval);
   }, [stocks.length]);
 
-  const loadLivePrices = async () => {
+  async function loadLivePrices() {
     try {
       setPricesLoading(true);
       const instruments = stocks
@@ -76,7 +76,7 @@ function Watchlist() {
     });
   };
 
-  const loadWatchlist = async () => {
+  async function loadWatchlist() {
     try {
       setLoading(true);
 

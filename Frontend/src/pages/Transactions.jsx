@@ -44,7 +44,7 @@ function Transactions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  const loadTransactions = async (pageNumber = page) => {
+  async function loadTransactions(pageNumber = page) {
     try {
       setLoading(true);
 

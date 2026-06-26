@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, lazy, Suspense } from "react";
 import api from "./api/api";
-import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import ToastProvider from "./components/ToastProvider";
