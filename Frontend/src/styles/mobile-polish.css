@@ -78,13 +78,14 @@ html, body, .dashboard-layout, .dashboard-main, .dashboard-content {
     left: 0 !important;
     bottom: 0 !important;
     width: 270px !important;
-    height: 100vh !important;
+    height: 100dvh !important;
     z-index: 100000 !important;
     transform: translateX(-270px) !important;
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     box-shadow: 16px 0 60px rgba(15, 23, 42, 0.35) !important;
     overflow-y: auto !important;
     flex-direction: column !important;
+    padding-bottom: 80px !important;
   }
 
   .sidebar.sidebar-open {
