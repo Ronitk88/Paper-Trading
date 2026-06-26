@@ -19,12 +19,61 @@ function TradingJournal() {
     mistake: "",
     learning: "",
     mood: "Calm",
+    mood: "Calm",
     tags: "",
   };
+
+  const JOURNAL_RULES = [
+    {
+      id: "setup",
+      title: "Did I enter with a clear setup?",
+      prompt: "What was your setup?\nWas it breakout, support bounce, resistance rejection, trend-following, or reversal?",
+      fields: ["strategy", "reason"],
+    },
+    {
+      id: "risk",
+      title: "Was risk controlled before entry?",
+      prompt: "Did you define stop loss before entering?\nWas your risk/reward acceptable?\nHow much capital was at risk?",
+      fields: ["reason", "mistake", "learning"],
+    },
+    {
+      id: "emotion",
+      title: "Did I chase price emotionally?",
+      prompt: "Did you enter because of FOMO?\nDid you wait for confirmation?\nWas this a planned trade or impulsive trade?",
+      fields: ["mistake", "learning"],
+    },
+    {
+      id: "exit",
+      title: "Was the exit planned?",
+      prompt: "What was your target?\nWhat was your stop loss?\nDid you exit according to plan?",
+      fields: ["reason", "learning"],
+    },
+    {
+      id: "mistake",
+      title: "What mistake should I avoid next time?",
+      prompt: "What should you avoid in the next trade?",
+      fields: ["mistake", "learning"],
+    },
+    {
+      id: "chart",
+      title: "What did the chart teach me?",
+      prompt: "What pattern, level, candle, volume behavior, or trend did you observe?",
+      fields: ["learning", "strategy"],
+    },
+  ];
 
   const [entries, setEntries] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+
+  const [reviewModal, setReviewModal] = useState({
+    isOpen: false,
+    id: "",
+    title: "",
+    prompt: "",
+    answerText: "",
+    fields: [],
+  });
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -106,6 +155,36 @@ function TradingJournal() {
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
+  };
+
+  const handleSaveReview = () => {
+    if (!reviewModal.answerText.trim()) {
+      alert("Please enter your review note before saving.");
+      return;
+    }
+
+    setForm((prev) => {
+      const updated = { ...prev };
+      
+      // Append the answer to the relevant fields
+      reviewModal.fields.forEach((field) => {
+        const existing = updated[field] || "";
+        const entryText = `[${reviewModal.title}]\n${reviewModal.answerText.trim()}`;
+        updated[field] = existing ? `${existing}\n\n${entryText}` : entryText;
+      });
+
+      // Smart Mood Update for Emotional Trading
+      if (reviewModal.id === "emotion") {
+        const ans = reviewModal.answerText.toLowerCase();
+        if (ans.includes("yes") || ans.includes("fomo") || ans.includes("impulsive")) {
+          updated.mood = "Impulsive";
+        }
+      }
+
+      return updated;
+    });
+
+    setReviewModal((prev) => ({ ...prev, isOpen: false, answerText: "" }));
   };
 
   const buildPayload = () => {
@@ -421,17 +500,41 @@ function TradingJournal() {
               </div>
 
               <div className="market-card-list">
-                {[
-                  "Did I enter with a clear setup?",
-                  "Was risk controlled before entry?",
-                  "Did I chase price emotionally?",
-                  "Was the exit planned?",
-                  "What mistake should I avoid next time?",
-                  "What did the chart teach me?",
-                ].map((item) => (
-                  <div className="market-card-item" key={item}>
-                    <strong>{item}</strong>
-                    <span>Review</span>
+                {JOURNAL_RULES.map((rule) => (
+                  <div className="market-card-item" key={rule.id}>
+                    <strong>{rule.title}</strong>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReviewModal({
+                          isOpen: true,
+                          id: rule.id,
+                          title: rule.title,
+                          prompt: rule.prompt,
+                          answerText: "",
+                          fields: rule.fields,
+                        })
+                      }
+                      style={{
+                        padding: "6px 14px",
+                        fontSize: "13px",
+                        fontWeight: "700",
+                        borderRadius: "8px",
+                        background: "#eff6ff",
+                        color: "#2563eb",
+                        border: "1px solid #bfdbfe",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = "#dbeafe";
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = "#eff6ff";
+                      }}
+                    >
+                      Review
+                    </button>
                   </div>
                 ))}
               </div>
@@ -603,6 +706,107 @@ function TradingJournal() {
           </div>
         </div>
       </div>
+
+      {/* Review Modal Popup */}
+      {reviewModal.isOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(15, 23, 42, 0.6)",
+            backdropFilter: "blur(4px)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            className="pro-panel"
+            style={{
+              width: "100%",
+              maxWidth: "540px",
+              padding: "24px",
+              margin: 0,
+              animation: "slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                marginBottom: "16px",
+              }}
+            >
+              <h3 style={{ margin: 0, fontSize: "18px", color: "#1e293b", fontWeight: "800", lineHeight: 1.4 }}>
+                {reviewModal.title}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setReviewModal((prev) => ({ ...prev, isOpen: false }))}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "24px",
+                  cursor: "pointer",
+                  color: "#94a3b8",
+                  padding: "0 4px",
+                  lineHeight: 1,
+                }}
+              >
+                &times;
+              </button>
+            </div>
+
+            <div
+              style={{
+                padding: "16px",
+                background: "#f8fafc",
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
+                marginBottom: "20px",
+              }}
+            >
+              <p style={{ margin: 0, color: "#475569", fontSize: "14.5px", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
+                {reviewModal.prompt}
+              </p>
+            </div>
+
+            <textarea
+              style={{ ...textAreaStyle, minHeight: "120px" }}
+              placeholder="Type your honest review here... Your answer will be automatically saved to your journal."
+              value={reviewModal.answerText}
+              onChange={(e) =>
+                setReviewModal((prev) => ({ ...prev, answerText: e.target.value }))
+              }
+              autoFocus
+            />
+
+            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "16px" }}>
+              <button
+                type="button"
+                className="warning-action"
+                onClick={() => setReviewModal((prev) => ({ ...prev, isOpen: false }))}
+                style={{ background: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="primary-action"
+                onClick={handleSaveReview}
+              >
+                Save to Journal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
