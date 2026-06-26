@@ -211,9 +211,6 @@ function LiveMarketTicker() {
         onMouseMove={handleMouseMove}
         onMouseUp={stopDragging}
         onMouseLeave={stopDragging}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={stopDragging}
       >
         {tickerItems.map((item, index) => (
           <button

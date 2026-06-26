@@ -354,6 +354,7 @@ function TradingJournal() {
 
               <form onSubmit={saveEntry}>
                 <div
+                  className="journal-form-grid"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -610,11 +611,11 @@ function TradingJournal() {
                 <tbody>
                   {entries.map((entry) => (
                     <tr key={entry.id}>
-                      <td>
+                      <td data-label="Symbol">
                         <strong>{entry.symbol}</strong>
                       </td>
 
-                      <td>
+                      <td data-label="Type">
                         <span
                           className={
                             entry.trade_type === "BUY"
@@ -628,20 +629,20 @@ function TradingJournal() {
                         </span>
                       </td>
 
-                      <td>{entry.quantity || "-"}</td>
-                      <td>₹{formatMoney(entry.entry_price)}</td>
-                      <td>₹{formatMoney(entry.exit_price)}</td>
-                      <td>{entry.mood || "-"}</td>
+                      <td data-label="Qty">{entry.quantity || "-"}</td>
+                      <td data-label="Entry">₹{formatMoney(entry.entry_price)}</td>
+                      <td data-label="Exit">₹{formatMoney(entry.exit_price)}</td>
+                      <td data-label="Mood">{entry.mood || "-"}</td>
 
-                      <td style={{ maxWidth: "280px", color: "#64748b" }}>
+                      <td data-label="Learning" style={{ maxWidth: "280px", color: "#64748b" }}>
                         {entry.learning || entry.reason || "-"}
                       </td>
 
-                      <td style={{ color: "#64748b" }}>
+                      <td data-label="Date" style={{ color: "#64748b" }}>
                         {formatDate(entry.created_at)}
                       </td>
 
-                      <td>
+                      <td data-label="Action">
                         <div style={{ display: "flex", gap: "8px" }}>
                           <button
                             className="primary-action"

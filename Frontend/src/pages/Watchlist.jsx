@@ -414,7 +414,7 @@ function Watchlist() {
                         style={{ cursor: "pointer" }}
                         onClick={() => openStock(symbol)}
                       >
-                        <td>
+                        <td data-label="Symbol">
                           <button
                             type="button"
                             onClick={(e) => {
@@ -434,7 +434,7 @@ function Watchlist() {
                           </button>
                         </td>
 
-                        <td>
+                        <td data-label="Name">
                           <strong>{item.name || "Watchlist Instrument"}</strong>
                           <p
                             style={{
@@ -448,7 +448,7 @@ function Watchlist() {
                           </p>
                         </td>
 
-                        <td>
+                        <td data-label="Exchange">
                           {item.exchange ? (
                             <span
                               className={
@@ -464,13 +464,13 @@ function Watchlist() {
                           )}
                         </td>
 
-                        <td>
+                        <td data-label="LTP">
                           <strong style={{ fontSize: "16px" }}>
                             {live?.ltp != null ? `₹${formatMoney(live.ltp)}` : pricesLoading ? "..." : "-"}
                           </strong>
                         </td>
 
-                        <td>
+                        <td data-label="Change">
                           {live?.change != null ? (
                             <span style={{ color: Number(live.change) >= 0 ? "#16a34a" : "#dc2626", fontWeight: "800" }}>
                               {Number(live.change) >= 0 ? "+" : ""}₹{formatMoney(live.change)}
@@ -479,13 +479,13 @@ function Watchlist() {
                           ) : pricesLoading ? "..." : "-"}
                         </td>
 
-                        <td>
+                        <td data-label="High / Low">
                           <span style={{ color: "#475569", fontWeight: "700", fontSize: "13px" }}>
                             {live?.high != null ? `₹${formatMoney(live.high)}` : "-"} / {live?.low != null ? `₹${formatMoney(live.low)}` : "-"}
                           </span>
                         </td>
 
-                        <td>
+                        <td data-label="Action">
                           <div
                             style={{
                               display: "flex",

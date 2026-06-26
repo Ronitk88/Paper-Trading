@@ -477,6 +477,7 @@ function TradingViewChart({
 
     return (
       <svg
+        className="tradingview-chart-svg"
         viewBox={`0 0 ${width} ${height}`}
         style={{ width: "100%", height: "430px", display: "block" }}
         aria-label={`${displayName || tradingsymbol} candlestick chart`}
@@ -913,6 +914,7 @@ function TradingViewChart({
       )}
 
       <div
+        className="tradingview-chart-container"
         style={{
           minHeight: "460px",
           display: "flex",

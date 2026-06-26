@@ -664,7 +664,7 @@ function Portfolio() {
                         style={{ cursor: "pointer" }}
                         onClick={() => openStock(item.symbol)}
                       >
-                        <td>
+                        <td data-label="Symbol">
                           <button
                             type="button"
                             onClick={(e) => {
@@ -684,11 +684,11 @@ function Portfolio() {
                           </button>
                         </td>
 
-                        <td>{formatNumber(item.quantity)}</td>
+                        <td data-label="Qty">{formatNumber(item.quantity)}</td>
 
-                        <td>₹{formatMoney(item.avg_price)}</td>
+                        <td data-label="Avg Price">₹{formatMoney(item.avg_price)}</td>
 
-                        <td>
+                        <td data-label="Current Price">
                           ₹{formatMoney(getLivePrice(item))}
                           {marketPrices[item.symbol]?.ltp && (
                             <span style={{
@@ -702,17 +702,19 @@ function Portfolio() {
                           )}
                         </td>
 
-                        <td>₹{formatMoney(invested)}</td>
+                        <td data-label="Invested">₹{formatMoney(invested)}</td>
 
-                        <td>₹{formatMoney(current)}</td>
+                        <td data-label="Current Value">₹{formatMoney(current)}</td>
 
                         <td
+                          data-label="P&L"
                           className={pnl >= 0 ? "pro-positive" : "pro-negative"}
                         >
                           ₹{formatMoney(pnl)}
                         </td>
 
                         <td
+                          data-label="P&L %"
                           className={
                             pnlPercent >= 0 ? "pro-positive" : "pro-negative"
                           }
@@ -720,7 +722,7 @@ function Portfolio() {
                           {pnlPercent.toFixed(2)}%
                         </td>
 
-                        <td>
+                        <td data-label="Action">
                           <div
                             style={{
                               display: "flex",

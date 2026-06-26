@@ -669,7 +669,7 @@ function Orders() {
                           onClick={() => toggleTimeline(order.id)}
                           style={{ cursor: "pointer" }}
                         >
-                          <td style={{ textAlign: "center" }}>
+                          <td className="hide-mobile" style={{ textAlign: "center" }}>
                             <span
                               style={{
                                 display: "inline-flex",
@@ -689,11 +689,11 @@ function Orders() {
                             </span>
                           </td>
 
-                          <td>
+                          <td data-label="Order ID">
                             <strong>#{order.id}</strong>
                           </td>
 
-                          <td>
+                          <td data-label="Symbol">
                             <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); openStock(order.symbol); }}
@@ -710,13 +710,13 @@ function Orders() {
                             </button>
                           </td>
 
-                          <td>
+                          <td data-label="Side">
                             <span className={getSideClass(order.side)}>
                               {order.side}
                             </span>
                           </td>
 
-                          <td style={{ whiteSpace: "nowrap" }}>
+                          <td data-label="Qty × Price" style={{ whiteSpace: "nowrap" }}>
                             <strong>{order.quantity}</strong>
                             <span style={{ color: "#94a3b8", margin: "0 4px" }}>×</span>
                             <span>₹{formatMoney(order.price)}</span>
@@ -725,9 +725,9 @@ function Orders() {
                             </div>
                           </td>
 
-                          <td>₹{formatMoney(orderValue)}</td>
+                          <td data-label="Value">₹{formatMoney(orderValue)}</td>
 
-                          <td>
+                          <td data-label="Cur. Value">
                             {livePrice ? (
                               <span>
                                 <span>₹{formatMoney(curValue)}</span>
@@ -752,17 +752,17 @@ function Orders() {
                             )}
                           </td>
 
-                          <td>
+                          <td data-label="Status">
                             <span className={getStatusClass(order.status)}>
                               {order.status}
                             </span>
                           </td>
 
-                          <td style={{ color: "#6b7280", fontWeight: "700", fontSize: "13px", whiteSpace: "nowrap" }}>
+                          <td data-label="Time" style={{ color: "#6b7280", fontWeight: "700", fontSize: "13px", whiteSpace: "nowrap" }}>
                             {formatDate(order.created_at)}
                           </td>
 
-                          <td>
+                          <td data-label="Action">
                             {order.status === "PENDING" ? (
                               <button
                                 className="danger-action"
@@ -784,7 +784,7 @@ function Orders() {
                         </tr>
 
                         {isExpanded && (
-                          <tr>
+                          <tr className="hide-mobile">
                             <td colSpan="10" style={{ padding: "0 16px", background: "#f8fafc" }}>
                               {orderTimeline(order)}
                               {order.rejection_reason && (

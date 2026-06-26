@@ -646,11 +646,11 @@ function Transactions() {
 
                     return (
                       <tr key={tx.id}>
-                        <td>
+                        <td data-label="Tx ID">
                           <strong>#{tx.id}</strong>
                         </td>
 
-                        <td>
+                        <td data-label="Symbol">
                           <button
                             type="button"
                             onClick={() => openStock(tx.symbol)}
@@ -667,7 +667,7 @@ function Transactions() {
                           </button>
                         </td>
 
-                        <td>
+                        <td data-label="Type">
                           <span
                             className={
                               isBuy
@@ -679,15 +679,15 @@ function Transactions() {
                           </span>
                         </td>
 
-                        <td>{formatNumber(tx.quantity)}</td>
+                        <td data-label="Quantity">{formatNumber(tx.quantity)}</td>
 
-                        <td>₹{formatMoney(tx.price)}</td>
+                        <td data-label="Price">₹{formatMoney(tx.price)}</td>
 
-                        <td>
+                        <td data-label="Total Value">
                           <strong>₹{formatMoney(total)}</strong>
                         </td>
 
-                        <td>
+                        <td data-label="Cur. Value">
                           {marketPrices[tx.symbol]?.ltp ? (
                             <span>
                               ₹{formatMoney(marketPrices[tx.symbol].ltp * (tx.quantity || 0))}
@@ -705,11 +705,11 @@ function Transactions() {
                           )}
                         </td>
 
-                        <td style={{ color: "#6b7280", fontWeight: "700" }}>
+                        <td data-label="Date" style={{ color: "#6b7280", fontWeight: "700" }}>
                           {formatDate(tx.created_at)}
                         </td>
 
-                        <td>
+                        <td data-label="Action">
                           <button
                             type="button"
                             className="primary-action"

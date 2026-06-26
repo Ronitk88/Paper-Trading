@@ -1,10 +1,28 @@
+import { useState, useEffect } from "react";
+
 function LogoutModal({ open, onClose, onLogoutNow, onStayLoggedIn }) {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [initialUntil, setInitialUntil] = useState(null);
+
+  useEffect(() => {
+    if (open) {
+      const now = new Date();
+      setCurrentTime(now);
+      setInitialUntil(new Date(now.getTime() + 60 * 60 * 1000));
+
+      const timer = setInterval(() => {
+        setCurrentTime(new Date());
+      }, 1000);
+      return () => clearInterval(timer);
+    } else {
+      setInitialUntil(null);
+    }
+  }, [open]);
+
   if (!open) return null;
 
-  const now = new Date();
-  const defaultUntil = new Date(now.getTime() + 60 * 60 * 1000);
-
   const formatInputDate = (date) => {
+    if (!date) return "";
     const pad = (value) => String(value).padStart(2, "0");
 
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
@@ -52,7 +70,7 @@ function LogoutModal({ open, onClose, onLogoutNow, onStayLoggedIn }) {
           <div className="info-row">
             <span className="info-label">Current Time</span>
             <span className="info-value">
-              {now.toLocaleString("en-IN", {
+              {currentTime.toLocaleString("en-IN", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
@@ -69,7 +87,7 @@ function LogoutModal({ open, onClose, onLogoutNow, onStayLoggedIn }) {
           <input
             id="logout-until-time"
             type="datetime-local"
-            defaultValue={formatInputDate(defaultUntil)}
+            defaultValue={initialUntil ? formatInputDate(initialUntil) : ""}
             style={inputStyle}
           />
 
@@ -117,7 +135,7 @@ const inputStyle = {
   borderRadius: "12px",
   border: "1px solid #d1d5db",
   outline: "none",
-  fontSize: "15px",
+  fontSize: "16px",
 };
 
 export default LogoutModal;

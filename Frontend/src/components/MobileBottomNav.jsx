@@ -11,27 +11,37 @@ function MobileBottomNav() {
   return (
     <nav className="mobile-bottom-nav">
       <NavLink to="/dashboard">
-        <FaHome />
-        <span>Home</span>
+        <div className="nav-icon-wrapper">
+          <FaHome />
+        </div>
+        <span>Dashboard</span>
       </NavLink>
 
       <NavLink to="/stocks">
-        <FaSearch />
+        <div className="nav-icon-wrapper">
+          <FaSearch />
+        </div>
         <span>Stocks</span>
       </NavLink>
 
       <NavLink to="/watchlist">
-        <FaStar />
-        <span>Watch</span>
+        <div className="nav-icon-wrapper">
+          <FaStar />
+        </div>
+        <span>Watchlist</span>
       </NavLink>
 
       <NavLink to="/portfolio">
-        <FaBriefcase />
+        <div className="nav-icon-wrapper">
+          <FaBriefcase />
+        </div>
         <span>Portfolio</span>
       </NavLink>
 
       <NavLink to="/orders">
-        <FaClipboardList />
+        <div className="nav-icon-wrapper">
+          <FaClipboardList />
+        </div>
         <span>Orders</span>
       </NavLink>
     </nav>

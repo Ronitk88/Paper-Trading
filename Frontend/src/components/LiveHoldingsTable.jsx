@@ -204,16 +204,17 @@ function LiveHoldingsTable({ holdings = [], onQuote }) {
 
               return (
                 <tr key={h.id || h.symbol}>
-                  <td style={{ padding: "10px 14px", fontWeight: "800" }}>
+                  <td data-label="Symbol" style={{ padding: "10px 14px", fontWeight: "800" }}>
                     {h.symbol}
                   </td>
-                  <td style={{ padding: "10px 14px", textAlign: "right" }}>
+                  <td data-label="Qty" style={{ padding: "10px 14px", textAlign: "right" }}>
                     {qty}
                   </td>
-                  <td style={{ padding: "10px 14px", textAlign: "right" }}>
+                  <td data-label="Avg Price" style={{ padding: "10px 14px", textAlign: "right" }}>
                     ₹{formatMoney(avgPrice)}
                   </td>
                   <td
+                    data-label="LTP"
                     style={{
                       padding: "10px 14px",
                       textAlign: "right",
@@ -223,13 +224,14 @@ function LiveHoldingsTable({ holdings = [], onQuote }) {
                   >
                     ₹{formatMoney(ltp)}
                   </td>
-                  <td style={{ padding: "10px 14px", textAlign: "right" }}>
+                  <td data-label="Invested" style={{ padding: "10px 14px", textAlign: "right" }}>
                     ₹{formatMoney(investedValue)}
                   </td>
-                  <td style={{ padding: "10px 14px", textAlign: "right" }}>
+                  <td data-label="Current" style={{ padding: "10px 14px", textAlign: "right" }}>
                     ₹{formatMoney(currentValue)}
                   </td>
                   <td
+                    data-label="P&L"
                     style={{
                       padding: "10px 14px",
                       textAlign: "right",
