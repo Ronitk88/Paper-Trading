@@ -478,6 +478,7 @@ function Login() {
             }}
           >
             <GoogleLogin
+              key={googleWidth}
               onSuccess={handleGoogleLogin}
               onError={handleGoogleError}
               text={isLogin ? "signin_with" : "signup_with"}
