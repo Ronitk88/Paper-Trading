@@ -204,3 +204,42 @@ def get_broker_status(
             or os.getenv("ANGELONE_API_KEY")
         ),
     }
+
+@router.get("/config-status")
+def get_broker_config_status():
+    api_key = (
+        os.getenv("ANGEL_API_KEY")
+        or os.getenv("ANGEL_ONE_API_KEY")
+        or os.getenv("SMARTAPI_API_KEY")
+    )
+
+    client_code = (
+        os.getenv("ANGEL_CLIENT_ID")
+        or os.getenv("ANGEL_CLIENT_CODE")
+        or os.getenv("ANGEL_ONE_CLIENT_CODE")
+        or os.getenv("SMARTAPI_CLIENT_CODE")
+    )
+
+    password = (
+        os.getenv("ANGEL_PASSWORD")
+        or os.getenv("ANGEL_PIN")
+        or os.getenv("SMARTAPI_PASSWORD")
+    )
+
+    totp_secret = (
+        os.getenv("ANGEL_TOTP_SECRET")
+        or os.getenv("SMARTAPI_TOTP_SECRET")
+    )
+
+    return {
+        "provider": "ANGELONE",
+        "source": "environment",
+        "api_key_set": bool(api_key),
+        "client_code_set": bool(client_code),
+        "password_set": bool(password),
+        "totp_secret_set": bool(totp_secret),
+        "api_key_display": "Set via environment" if api_key else "Not set",
+        "client_code_display": "Set via environment" if client_code else "Not set",
+        "password_display": "Set via environment" if password else "Not set",
+        "totp_secret_display": "Set via environment" if totp_secret else "Not set",
+    }

@@ -145,6 +145,49 @@ def health_check():
         "service": "paper-trading-api",
     }
 
+@app.get("/broker/config-status")
+def broker_config_status():
+    angel_api_key = (
+        os.getenv("ANGEL_API_KEY")
+        or os.getenv("ANGEL_ONE_API_KEY")
+        or os.getenv("SMARTAPI_API_KEY")
+    )
+
+    angel_client_code = (
+        os.getenv("ANGEL_CLIENT_CODE")
+        or os.getenv("ANGEL_CLIENT_ID")
+        or os.getenv("ANGEL_ONE_CLIENT_CODE")
+        or os.getenv("SMARTAPI_CLIENT_CODE")
+    )
+
+    angel_password = (
+        os.getenv("ANGEL_PASSWORD")
+        or os.getenv("ANGEL_PIN")
+        or os.getenv("SMARTAPI_PASSWORD")
+    )
+
+    angel_totp_secret = (
+        os.getenv("ANGEL_TOTP_SECRET")
+        or os.getenv("ANGEL_ONE_TOTP_SECRET")
+        or os.getenv("SMARTAPI_TOTP_SECRET")
+    )
+
+    return {
+        "provider": "ANGELONE",
+        "source": "environment",
+        "api_key_set": bool(angel_api_key),
+        "client_code_set": bool(angel_client_code),
+        "password_set": bool(angel_password),
+        "totp_secret_set": bool(angel_totp_secret),
+        "api_key_display": "Set via environment" if angel_api_key else "Not set",
+        "client_code_display": "Set via environment"
+        if angel_client_code
+        else "Not set",
+        "password_display": "Set via environment" if angel_password else "Not set",
+        "totp_secret_display": "Set via environment"
+        if angel_totp_secret
+        else "Not set",
+    }
 
 @app.on_event("startup")
 def startup_tasks():
