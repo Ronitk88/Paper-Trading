@@ -159,6 +159,7 @@ html, body, .dashboard-layout, .dashboard-main, .dashboard-content {
   .navbar-ticker-wrap {
     grid-area: ticker !important;
     width: 100% !important;
+    max-width: none !important; /* Override layout max-width constraints to let ticker span full line */
     margin: 0 !important;
     border-radius: 10px !important;
     overflow: hidden !important;
