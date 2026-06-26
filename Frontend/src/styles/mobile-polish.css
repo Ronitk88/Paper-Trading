@@ -52,8 +52,13 @@
 }
 
 /* Base resets & scroll behavior */
-html, body, .dashboard-layout, .dashboard-main, .dashboard-content {
+html, body {
   overflow-x: hidden !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.dashboard-layout, .dashboard-main, .dashboard-content {
   max-width: 100% !important;
   box-sizing: border-box !important;
 }
