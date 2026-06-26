@@ -2,6 +2,7 @@ import { useEffect, useMemo, lazy, Suspense } from "react";
 import api from "./api/api";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+import MarketGuard from "./components/MarketGuard";
 import ToastProvider from "./components/ToastProvider";
 import ConfirmProvider from "./components/ConfirmProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -130,7 +131,7 @@ function ProtectedRoute({ children }) {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return <MarketGuard>{children}</MarketGuard>;
 }
 
 function PublicRoute({ children }) {
