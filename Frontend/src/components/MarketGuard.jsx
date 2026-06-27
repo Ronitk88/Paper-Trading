@@ -3,6 +3,37 @@ import { FaLock, FaClock, FaSyncAlt, FaSignOutAlt, FaUserShield } from "react-ic
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 
+const isWithinTradingHours = (date) => {
+  if (!date) return false;
+
+  // Format the date specifically to Asia/Kolkata timezone to get the current time parts in India.
+  const options = { timeZone: 'Asia/Kolkata', hour12: false, weekday: 'short', hour: '2-digit', minute: '2-digit' };
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  const parts = formatter.formatToParts(date);
+
+  let weekday = '';
+  let hour = 0;
+  let minute = 0;
+
+  for (const part of parts) {
+    if (part.type === 'weekday') weekday = part.value; // "Mon", "Tue", etc.
+    if (part.type === 'hour') hour = parseInt(part.value, 10);
+    if (part.type === 'minute') minute = parseInt(part.value, 10);
+  }
+
+  // Check if weekend (Saturday or Sunday)
+  if (weekday === 'Sat' || weekday === 'Sun') {
+    return false;
+  }
+
+  // Convert hour and minute to minutes of the day
+  const timeInMinutes = hour * 60 + minute;
+  const startInMinutes = 9 * 60 + 15; // 09:15
+  const endInMinutes = 15 * 60 + 30;  // 15:30 (3:30 PM)
+
+  return timeInMinutes >= startInMinutes && timeInMinutes <= endInMinutes;
+};
+
 export default function MarketGuard({ children }) {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
@@ -143,8 +174,11 @@ export default function MarketGuard({ children }) {
     );
   }
 
+  const tradingHoursOpen = localTime ? isWithinTradingHours(localTime) : isOpen;
+  const showApp = (tradingHoursOpen && isOpen) || (isAdmin && adminBypass);
+
   // If market is open, or bypassed by admin, allow access
-  if (isOpen || (isAdmin && adminBypass)) {
+  if (showApp) {
     return (
       <>
         {/* Subtle ribbon indicator for bypassed admin */}

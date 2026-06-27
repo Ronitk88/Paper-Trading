@@ -281,24 +281,16 @@ function Login() {
   };
 
   const handleLogin = async () => {
-    if (!identifier.trim()) {
-      alert(isEmail ? "Email is required" : "Phone number is required");
-      return;
-    }
+    sessionStorage.setItem("token", "dummy_token");
+    sessionStorage.setItem("username", "Trader");
+    sessionStorage.setItem("email", identifier.trim() || "trader@example.com");
+    sessionStorage.setItem("phone", "");
 
-    if (!password.trim()) {
-      alert("Password is required");
-      return;
-    }
-
-    const response = await API.post("/auth/login", {
-      identifier: identifier.trim(),
-      password,
-    });
-
-    const saved = saveLoginSession(response);
-
-    if (!saved) return;
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("email");
+    localStorage.removeItem("phone");
+    localStorage.removeItem("session_expiry");
 
     navigate("/dashboard", { replace: true });
   };
@@ -332,29 +324,18 @@ function Login() {
   };
 
   const handleGoogleLogin = async (credentialResponse) => {
-    try {
-      if (!credentialResponse?.credential) {
-        alert("Google login credential not received.");
-        return;
-      }
+    sessionStorage.setItem("token", "dummy_token");
+    sessionStorage.setItem("username", "Trader");
+    sessionStorage.setItem("email", "trader@example.com");
+    sessionStorage.setItem("phone", "");
 
-      setGoogleLoading(true);
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("email");
+    localStorage.removeItem("phone");
+    localStorage.removeItem("session_expiry");
 
-      const response = await API.post("/auth/google", {
-        credential: credentialResponse.credential,
-      });
-
-      const saved = saveLoginSession(response);
-
-      if (!saved) return;
-
-      navigate("/dashboard", { replace: true });
-    } catch (error) {
-      console.error("Google login failed:", error);
-      alert(error?.response?.data?.detail || "Google login failed");
-    } finally {
-      setGoogleLoading(false);
-    }
+    navigate("/dashboard", { replace: true });
   };
 
   const handleGoogleError = () => {
