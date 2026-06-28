@@ -67,6 +67,7 @@ def get_allowed_origins():
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "https://paper-trading-7pd8.vercel.app",
+        "https://paper-trading-chi.vercel.app",
     ]
 
     frontend_url = os.getenv("FRONTEND_URL")
