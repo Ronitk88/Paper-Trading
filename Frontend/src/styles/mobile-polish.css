@@ -348,13 +348,17 @@ html, body {
   .table-card,
   .dashboard-card,
   .stat-card,
-  .pro-kpi-card,
-  .welcome-section {
+  .pro-kpi-card {
     border-radius: 20px !important;
     padding: 18px !important;
     border: 1px solid rgba(226, 232, 240, 0.7) !important;
     background: #ffffff !important;
     box-shadow: 0 10px 30px rgba(37, 99, 235, 0.03), 0 2px 8px rgba(37, 99, 235, 0.02) !important;
+  }
+
+  .welcome-section {
+    border-radius: 20px !important;
+    padding: 18px !important;
   }
 
   /* Typography tweaks */
@@ -707,6 +711,18 @@ html, body {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     flex: 1 !important;
+  }
+
+  .professional-modal .modal-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 16px 20px 20px !important;
+  }
+
+  .professional-modal .modal-actions button {
+    width: 100% !important;
+    margin: 0 !important;
   }
 }
 

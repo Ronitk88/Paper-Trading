@@ -109,11 +109,11 @@ function LogoutModal({ open, onClose, onLogoutNow, onStayLoggedIn }) {
         </div>
 
         <div className="modal-actions">
-          <button className="danger-action" onClick={onLogoutNow}>
+          <button type="button" className="danger-action" onClick={onLogoutNow}>
             Logout Now
           </button>
 
-          <button className="primary-action" onClick={handleStayLoggedIn}>
+          <button type="button" className="primary-action" onClick={handleStayLoggedIn}>
             Stay Logged In
           </button>
         </div>
