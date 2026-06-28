@@ -281,10 +281,24 @@ function Login() {
   };
 
   const handleLogin = async () => {
-    sessionStorage.setItem("token", "dummy_token");
-    sessionStorage.setItem("username", "Trader");
-    sessionStorage.setItem("email", identifier.trim() || "trader@example.com");
-    sessionStorage.setItem("phone", "");
+    const ident = identifier.trim() || "trader@example.com";
+    const token = `dummy_token:${encodeURIComponent(ident)}`;
+
+    // Try to extract a nice username from email or phone
+    let displayName = "Trader";
+    let isEmailAddress = ident.includes("@");
+
+    if (isEmailAddress) {
+      const prefix = ident.split("@")[0];
+      displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+    } else if (ident) {
+      displayName = `Trader-${ident.slice(-4)}`;
+    }
+
+    sessionStorage.setItem("token", token);
+    sessionStorage.setItem("username", displayName);
+    sessionStorage.setItem("email", isEmailAddress ? ident : "");
+    sessionStorage.setItem("phone", isEmailAddress ? "" : ident);
 
     localStorage.removeItem("token");
     localStorage.removeItem("username");
@@ -324,10 +338,39 @@ function Login() {
   };
 
   const handleGoogleLogin = async (credentialResponse) => {
-    sessionStorage.setItem("token", "dummy_token");
-    sessionStorage.setItem("username", "Trader");
-    sessionStorage.setItem("email", "trader@example.com");
-    sessionStorage.setItem("phone", "");
+    try {
+      const credToken = credentialResponse?.credential;
+      if (credToken) {
+        // Decode Google JWT payload
+        const base64Url = credToken.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split("")
+            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+            .join("")
+        );
+        const payload = JSON.parse(jsonPayload);
+        const email = payload.email || "trader@example.com";
+        const name = payload.name || "Trader";
+
+        sessionStorage.setItem("token", `dummy_token:${encodeURIComponent(email)}`);
+        sessionStorage.setItem("username", name);
+        sessionStorage.setItem("email", email);
+        sessionStorage.setItem("phone", "");
+      } else {
+        sessionStorage.setItem("token", "dummy_token:trader@example.com");
+        sessionStorage.setItem("username", "Trader");
+        sessionStorage.setItem("email", "trader@example.com");
+        sessionStorage.setItem("phone", "");
+      }
+    } catch (e) {
+      console.error("Failed to parse Google login token:", e);
+      sessionStorage.setItem("token", "dummy_token:trader@example.com");
+      sessionStorage.setItem("username", "Trader");
+      sessionStorage.setItem("email", "trader@example.com");
+      sessionStorage.setItem("phone", "");
+    }
 
     localStorage.removeItem("token");
     localStorage.removeItem("username");

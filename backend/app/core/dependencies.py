@@ -20,18 +20,45 @@ def get_current_user(
     try:
         token = credentials.credentials
 
-        if token == "dummy_token":
+        if token == "dummy_token" or token.startswith("dummy_token:"):
+            identifier = "trader@example.com"
+            if token.startswith("dummy_token:"):
+                import urllib.parse
+                identifier = urllib.parse.unquote(token.split(":", 1)[1])
+
             from app.db.database import SessionLocal
             from app.models.user import User
             from app.models.portfolio import Portfolio
             db = SessionLocal()
             try:
-                user = db.query(User).first()
+                user = db.query(User).filter(
+                    (User.email == identifier.lower()) | (User.phone == identifier)
+                ).first()
+
                 if not user:
+                    username = "Trader"
+                    email_val = None
+                    phone_val = None
+
+                    if "@" in identifier:
+                        email_val = identifier.lower()
+                        parts = identifier.split("@")[0]
+                        username = parts.capitalize()
+                    else:
+                        phone_val = identifier
+                        username = f"Trader-{identifier[-4:]}" if len(identifier) >= 4 else "Trader"
+
+                    # Verify username doesn't exist
+                    existing_user = db.query(User).filter(User.username == username).first()
+                    if existing_user:
+                        import uuid
+                        username = f"{username}-{str(uuid.uuid4())[:4]}"
+
                     from app.core.security import hash_password
                     user = User(
-                        username="Trader",
-                        email="trader@example.com",
+                        username=username,
+                        email=email_val,
+                        phone=phone_val,
                         password=hash_password("password"),
                     )
                     db.add(user)
